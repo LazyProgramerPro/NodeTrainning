@@ -1230,6 +1230,456 @@ const aliasTopTours = (req, res, next) => {
 - Interview : matching router như thế nào ?!, thứ tự sắp xếp router?
 
 # PART 2 : Authen, Author
+- Model User
+Trong folder models tạo file user.model.js
+user.model.js
+
+```js
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcryptjs';
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Please tell us your name!']
+    },
+    email: {
+      type: String,
+      required: [true, 'Please provide your email'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email']
+    },
+    photo: String,
+    role: {
+      type: String,
+      enum: ['user', 'guide', 'lead-guide', 'admin'],
+      default: 'user'
+    },
+    password: {
+      type: String,
+      required: [true, 'Please provide a password'],
+      minlength: 8,
+      select: false
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'Please confirm your password'],
+      validate: {
+        // Chỉ hoạt động khi CREATE and SAVE!!!
+        validator: function(el) {
+          return el === this.password;
+        },
+        message: 'Passwords are not the same!'
+      }
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false
+    }
+  }
+);
+
+userSchema.pre('save', async function(next) {
+  // Chỉ chạy khi password được thay đổi, isModified là một method của mongoose để kiểm tra xem field có được thay đổi hay không
+  // Nếu mật khẩu không bị thay đổi, hàm sẽ gọi next() để tiếp tục quá trình lưu mà không làm gì thêm
+  // Lần đầu save data isModified sẽ trả về true
+  if (!this.isModified('password')) return next();
+
+  // Hash password với giá trị là 12
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // Xóa passwordConfirm field
+  this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next(); 
+  // kiểm tra xem password có được thay đổi hay không && có phải là tạo mới không
+  // nếu đúng sẽ k làm gì tiếp theo
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function(next) {
+  // this points to the current query
+  this.find({ active: { $ne: false } });
+  next();
+});
+
+userSchema.methods.correctPassword = async function(
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means NOT changed
+  return false;
+};
+
+// Hàm tạo token reset password
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
+export default mongoose.model('User', userSchema);
+
+```
+
+- Tạo các file user.controller.js, auth.controller.js trong folder controllers
+- Tạo folder user trong folder routers, tạo file user/index.js
+- Tạo các file user.service.js, auth.service.js trong folder services
+
+auth.service.js với các service cơ bản như signup, login, logout, forgotPassword, resetPassword...
+
+```js
+import userModel from '../models/user.model.js';
+
+export default class AuthService {
+  constructor() { }
+
+  static async signup(user) {
+    return await userModel.create(user);
+  }
+
+  static async accountActivation() {
+    return {
+      msg: "accountActivation success!"
+    }
+  }
+
+  static async login() {
+    return {
+      msg: "login success!"
+    }
+  }
+
+  static async signup() {
+    return {
+      msg: "signup success!"
+    }
+  }
+
+  static async logout() {
+    return {
+      msg: "logout success!"
+    }
+  }
+  
+  static async forgotPassword() {
+    return {
+      msg: "forgotPassword success!"
+    }
+  }
+
+  static async resetPassword() {
+    return {
+      msg: "resetPassword success!"
+    }
+  }
+
+  static async updatePassword() {
+    return {
+      msg: "updatePassword success!"
+    }
+  }
+}
+
+
+```
+
+auth.controller.js với các controller cơ bản như signup, login, logout, forgotPassword, resetPassword...
+
+```js
+import { SuccessResponse } from "../middlewares/responses.middeware.js";
+import AuthService from "../services/auth.service.js";
+
+class AuthController {
+  signup = async (req, res, next) => {
+    new SuccessResponse({
+      message: "signup success!",
+      metadata: await AuthService.signup(req.body)
+    }).send(res)
+  };
+
+  accountActivation = async (req, res, next) => {
+    new SuccessResponse({
+      message: "signup success!",
+      metadata: await AuthService.accountActivation()
+    }).send(res)
+  };
+
+  login = async (req, res, next) => {
+    new SuccessResponse({
+      message: "login success!",
+      metadata: await AuthService.login()
+    }).send(res)
+  };
+
+  logout = async (req, res, next) => {
+    new SuccessResponse({
+      message: "logout success!",
+      metadata: await AuthService.logout()
+    }).send(res)
+  };
+
+  forgotPassword = async (req, res, next) => {
+    new SuccessResponse({
+      message: "forgotPassword success!",
+      metadata: await AuthService.forgotPassword()
+    }).send(res)
+  };
+
+  resetPassword = async (req, res, next) => {
+    new SuccessResponse({
+      message: "resetPassword success!",
+      metadata: await AuthService.resetPassword()
+    }).send(res)
+  }
+  
+  updatePassword = async (req, res, next) => {
+    new SuccessResponse({
+      message: "updatePassword success!",
+      metadata: await AuthService.updatePassword()
+    }).send(res)
+  }
+
+}
+
+export default new AuthController();
+
+
+
+
+
+
+```
+
+user/index.js
+```js
+import { Router } from "express";
+import authController from "../../controllers/auth.controller.js";
+import catchAsync from "../../middlewares/catchAsync.middleware.js";
+
+const router = Router();
+
+// Auth Flow
+
+router.post('/signup', catchAsync(authController.signup));
+router.post('/accountActivation ', catchAsync(authController.accountActivation));
+router.post('/login', catchAsync(authController.login));
+router.get('/logout', catchAsync(authController.logout));
+router.post('/forgotPassword', catchAsync(authController.forgotPassword));
+router.patch('/resetPassword/:token', catchAsync(authController.resetPassword));
+router.patch('/updateMyPassword', catchAsync(authController.updatePassword));
+
+// User Flow
+
+export default router;
+
+
+```
+Đừng quên thêm vào file index trong routers\index.js
+
+```js
+import userRouter from './user/index.js'; 
+...
+router.use('/v1/api/user', userRouter);
+```
+
+File routes/index.js hiện tại
+
+```js
+import { Router } from "express";
+import tourRouter from './tour/index.js'; // Provide the correct path to tourController.js
+import userRouter from './user/index.js'; // Provide the correct path to userController.js
+const router = Router();
+router.use('/v1/api/tour', tourRouter);
+router.use('/v1/api/user', userRouter);
+export default router;
+```
+### Luồng signup
+- Lấy thông tin từ body : name, email, password, passwordConfirm
+- Kiểm tra xem email đã tồn tại chưa,có thì bào lỗi, chưa có tạo user mới
+- Tạo user mới
+- Tạo luồng hash password trước khi lưu vào db
+- Thêm luồng cong việc gửi email xác nhận tài khoản
+- Gửi email xác nhận tài khoản(nếu làm luồng này làm thêm 1 api active-bt về nhà) || Hoặc chào mừng tới ứng dụng
+- Viết hàm Send Token, lưu token vào cookie, gửi token về client
+- Trả kết quả về client trước đó đã được remove password
+
+utils/email.js
+
+```js
+import nodemailer from 'nodemailer';
+
+export class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstName = user.name.split(' ')[0];
+    this.url = url;
+    this.from = `D1 NodeJS Team <${process.env.EMAIL_FROM}>`;
+  }
+
+  newTransport() {
+    // if (process.env.NODE_ENV === 'production') {
+    //   // Sendgrid
+    //   return nodemailer.createTransport({
+    //     service: 'SendGrid',
+    //     auth: {
+    //       user: process.env.SENDGRID_USERNAME,
+    //       pass: process.env.SENDGRID_PASSWORD
+    //     }
+    //   });
+    // }
+
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+  }
+
+
+  // Send the actual email
+  async send(template, subject) {
+    // 1) Render HTML based on a pug template
+
+
+    // 2) Define email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject: 'Hello',
+      html: '<h2>Sending Emails with Node.js</h2>',
+    };
+
+    // 3) Create a transport and send email
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send('welcome', 'Welcome to the Natours Family!');
+  }
+};
+```
+
+auth.controller.js
+
+```js
+  signup = async (req, res, next) => {
+    new SuccessResponse({
+      message: "signup success!",
+      metadata: await AuthService.signup({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        passwordConfirm: req.body.passwordConfirm
+      }, req, res)
+    }).send(res)
+  };
+```
+services/auth.service.js
+
+```js
+  static async signToken(id) {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
+    });
+  }
+
+  static async createSendToken(user, statusCode, req, res) {
+    const token = await this.signToken(user._id);
+
+    res.cookie('jwt', token, {
+      expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+    });
+
+    // Remove password from output
+    user.password = undefined;
+
+    return {
+      token,
+      data: {
+        user
+      }
+    };
+
+  }
+
+  static async signup(user, req, res) {
+    // Lấy thông tin từ body : name, email, password, passwordConfirm
+    // Kiểm tra xem email đã tồn tại chưa,có thì bào lỗi, chưa có tạo user mới
+
+    const existingUser = await userModel.findOne({ email: user.email }).exec();
+    if (existingUser) {
+      throw new EmailAlreadyExistsError('Email is taken');
+    }
+
+    // Tạo user mới
+    const newUser = await userModel.create(user);
+
+    // Gửi email xác nhận tài khoản(nếu làm luồng này làm thêm 1 api active-bt về nhà) || Hoặc chào mừng tới ứng dụng
+    const url = `/me`;
+    await new Email(newUser, url).sendWelcome();
+
+    // Viết hàm Send Token, lưu token vào cookie, gửi token về client
+    return await this.createSendToken(newUser, 201, req, res);
+
+  }
+```
+
+env
+
+```sh
+EMAIL_USERNAME=b7fee33bc02201
+EMAIL_PASSWORD=3b6fa604c35d2b
+EMAIL_HOST=sandbox.smtp.mailtrap.io
+EMAIL_PORT=2525
+EMAIL_FROM=d1nodejsteam.com
+JWT_SECRET=secret
+JWT_EXPIRES_IN=60d
+JWT_COOKIE_EXPIRES_IN=60
+```
+
 # PART 3 : Advanced Mongo
 # PART 4 : Payment Striple/Api Doc
 # PART 5 : Docker/Deployment
