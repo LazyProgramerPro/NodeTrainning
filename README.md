@@ -1304,7 +1304,7 @@ userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next(); 
   // kiểm tra xem password có được thay đổi hay không && có phải là tạo mới không
   // nếu đúng sẽ k làm gì tiếp theo
-
+  //  this.isNew Nó trả về true nếu tài liệu đang được lưu là tài liệu mới, và false nếu tài liệu đang được cập nhật.
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
