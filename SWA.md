@@ -149,6 +149,21 @@ VD:Hệ thống phải đảm bảo hoạt động 24/7, chịu đc bn request m
 - DNS: Là 1 hệ thống mà chúng ta sử dụng để tìm kiếm tên miền, nó giúp chúng ta tìm kiếm tên miền mà không cần phải biết cách hoạt động bên trong của hệ thống
 ### Load Balancer
 - Load Balancer: Là 1 hệ thống mà chúng ta sử dụng để phân phối tải, nó giúp chúng ta phân phối tải mà không cần phải biết cách hoạt động bên trong của hệ thống
+- Là để cân bằng tải lưu lượng giữa 1 nhóm máy chủ, giúp chúng ta tăng hiệu suất và sự ổn định của hệ thống
+- Cách tốt nhất để đạt được tính sẵn sàng cao và khả năng mở rộng theo chiều ngang là chạy nhiều máy chủ giống hệt nhau cho ứng dụng của bạn và sử dụng load balancer để phân phối lưu lượng giữa chúng
+- Load balancer có thể phân phối lưu lượng dựa trên nhiều yếu tố như round-robin, least connections, least response time, ...
+- Các thuộc tính chất lượng
+    - Khả năng mở rộng cao: Bằng cách đặt thêm nhiều máy chủ + Load balancer có thể mở rộng theo chiều ngang
+    - Tính sẵn sàng cao: Đáp ứng được nhiều request cùng 1 lúc, đảm bảo hệ thống luôn hoạt động
+    - Performance cao: Phân phối lưu lượng giữa các máy chủ, giúp tăng hiệu suất và sự ổn định của hệ thống
+    - Khả năng bảo trì cao: Dễ dàng bảo trì và nâng cấp hệ thống, có thể thêm và gỡ các máy chủ mà không ảnh hưởng đến hệ thống
+- Các loại load balancer:
+    - DNS-based load balancer: Phân phối lưu lượng dựa trên DNS, giúp chúng ta phân phối lưu lượng giữa các máy chủ. Là một phần cơ sở hạ tầng internet 
+    - Hardware load balancer: Là phần cứng mà chúng ta sử dụng để phân phối lưu lượng, giúp chúng ta phân phối lưu lượng giữa các máy chủ
+    - Software load balancer: Là phần mềm mà chúng ta sử dụng để phân phối lưu lượng, giúp chúng ta phân phối lưu lượng giữa các máy chủ
+    - Hardware vs Software có thể chủ động theo dõi tình trạng máy chủ của chúng ta, để phát hiện xem có máy chủ nào đang gặp vấn đề và chuyển lưu lượng sang máy chủ khác
+
+    
 ### Reverse Proxy
 - Reverse Proxy: Là 1 hệ thống mà chúng ta sử dụng để bảo vệ hệ thống, nó giúp chúng ta bảo vệ hệ thống mà không cần phải biết cách hoạt động bên trong của hệ thống
 ### CDN (Content Delivery Network)
@@ -177,6 +192,48 @@ VD:Hệ thống phải đảm bảo hoạt động 24/7, chịu đc bn request m
 - Serverless: Là 1 kiến trúc mà chúng ta sử dụng để xây dựng hệ thống, nó giúp chúng ta xây dựng hệ thống mà không cần phải biết cách hoạt động bên trong của hệ thống
 ### API Gateway
 - API Gateway: Là 1 hệ thống mà chúng ta sử dụng để quản lý API, nó giúp chúng ta quản lý API mà không cần phải biết cách hoạt động bên trong của hệ thống
+
+## SA & System Design
+- Đầu tiên sẽ đặt những câu hỏi thu thập yêu cầu của người dùng
+- Các ràng buộc về mặt chức năng và phi chức năng
+- Những hạn chế của người dùng
+- Xác định rõ các API của mình
+- Create Diagram cho các chức năng theo yêu cầu
+- Tinh chỉnh Diagram để giải quyết các yêu cầu phi chức năng
+- Vì là thiết kế hệ thống nên không có nghĩa là ai đúng ai sai cả tham khảo mô hình Triple Diamon
+- Vấn đề quan trọng là phỉa đưa ra sự đánh đổi chính xác tùy theo yêu cầu mà chúng ta thu thập được
+
+VD: Xây dựng 1 diễn đàn thảo luận 1 vấn đề gì đó công khai (Reddit,Quora, Stack Overflow ...) có khả năng mở rộng cao, nơi mọi người có thể đăng câu hỏi cập nhập tin tức bài đăng hoặc nhận xét, có thể upvote, downvote post comment, có dữ liệu về những bài viết được tương tác nhiều của họ
+- Việt thiết kế một hệ thống rất lớn như thế này từ con số 0, đặc biệt là hệ thống cần mở rộng quy mô ra cho hàng triệu người dùng trên toàn thế giới là rất khó khăn
+- Đầu tiên là đặt câu hỏi và nắm bắt tất cả các yêu cầu chức năng
+    - Bất kì ai cũng có thể xem các bài đăng và cmt hay chỉ những người dùng đã được đăng nhập
+    - Một bài viết có thể chứa những gì (text, image , video)
+    - Việc hiển thị các bài đăng phổ biến nhất có ý nghĩa gì, làm thế nào để chúng ta xác nhận chúng là phổ biến
+    - Cấu trúc của các cmt trong bài viết là gì? (Flat or Tree)
+- Sau khi đặt ra những yêu cầu đó chúng ta có các yêu cầu chức năng sau
+    - Người dùng có thể đăng kí và đăng nhập vào hệ thống để đăng bài hoặc cmt
+    - Người dùng có thể đăng 1 bài viết mới với tiêu đề, nội dung, image
+    - Người dùng có thể cmt bất kì bài đăng nào hiện có và các cmt phải được sắp xếp theo thời gian
+    - Cmt được sắp xếp thao dạng flatlist
+    - Cũng cho phép người dùng có thể xóa bài hoặc cmt của họ
+    - Người dùng phải đăng nhập thì mới có quyền upvote hoặc downvote 1 bài đăng hoặc 1 nhận xét đang có
+    - Người dùng mới login sẽ thấy những bài viết phổ biến trong 24h qua
+    - Phổ biến = Số lượng upvotes - downvotes chỉ trong 24h qua
+- Sau đó liệt kê các yc phi chức năng
+    - Điều đầu tiên và quan trọng nhất là khả năng mở rộng : hàng triệu người 1 ngày, những đột biến mà chúng ta cần có khả năng xử lí
+    - Performance: Mọi người dùng tương tác đều nhân được phản hồi dưới 1s
+    - Khả năng chịu lỗi và tính sẵn sàng cao, thời gian downtime thấp (99,9%)
+    - Đánh đổi giữa tính nhất quán và tính sẵn có
+    - Người dùng, bài đăng, cmt hoặc vote sẽ không bao giờ biến mất khỏi hệ thống trừ khi chúng bị xóa rõ ràng
+    - Ngoài ra sẽ có 1 số hạn chế về ngôn ngữ, Cloud
+- Thiết kế API
+    - Rest API
+        - Xác định các thực thể trong hệ thống của mình : user, post, image, comment, vote
+        - Mapping các thực thể đó đến URL : image here
+        - Xác định cách biểu diễn của từng tài nguyên (Model)
+        - Gán các METHOD cho resource
+    - Limit, paginate resource
+    
 
 # Usecase
 

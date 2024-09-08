@@ -92,3 +92,6 @@ export default class AuthService {
     }
   }
 }
+
+/* function test */
+

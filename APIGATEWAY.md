@@ -1,0 +1,24 @@
+# API gateway để làm gì? Tại sao chúng ta cần sử dụng API gateway?
+- API gateway là một dịch vụ trung gian, 1 điểm truy cập duy nhất từ Client đến các microservices. API gateway giúp chúng ta quản lý các request từ client, chuyển tiếp các request đến các microservices, và trả về kết quả cho client.
+- API gateway thường cung cấp 1 số chức năng quan trọng:
+  - Authentication: API gateway giúp chúng ta xác thực người dùng, đảm bảo rằng người dùng có quyền truy cập vào các API.
+  - Load balancing: API gateway giúp chúng ta phân phối tải giữa các microservices.
+  - Protocol translation: API gateway giúp chúng ta chuyển đổi giữa các giao thức khác nhau.
+  - Monitoring: API gateway giúp chúng ta theo dõi các request, response, và lỗi từ các microservices.
+  - Logging: API gateway giúp chúng ta ghi log các request, response, và lỗi từ các microservices.
+  - Analytics: API gateway giúp chúng ta phân tích dữ liệu từ các request, response, và lỗi từ các microservices.
+  - Billing: API gateway giúp chúng ta tính toán chi phí từ các request, response, và lỗi từ các microservices.
+  - Caching: API gateway giúp chúng ta lưu trữ cache từ các request, response, và lỗi từ các microservices.
+- Một quy trình thông thường khi sử dụng API gateway:
+  - Client gửi request đến API gateway (Thường là HTTP request, RESTful API, GraphQL).
+  - API gateway xác thực các yêu cầu HTTP
+  - API gateway kiểm tra địa chỉ IP và các HTTP header, kiểm tra danh sách đen trắng, kiểm tra token, kiểm tra chữ ký số, kiểm tra mã xác thực, kiểm tra mật khẩu
+  - API gateway Authentication và Authorization(Bản thân cái này cũng là 1 chủ đề khó)
+  - API gateway Rate limiting số lượng request từ client, nếu quá nhiều request thì API gateway sẽ từ chối request.
+  - API gateway Load balancing giữa các microservices.
+  - API gateway protocol translation giữa các giao thức khác nhau.
+  - API gateway chuyển tiếp request đến microservices.
+  - Microservices xử lý request và trả về kết quả cho API gateway.
+  - API gateway trả về kết quả cho client.
+- Ngoài luồng chính nếu ok ra thì trả về kết quả cho client, nếu có lỗi thì trả về lỗi cho client, circuit breaker, retry, timeout, fallback, cache, logging, monitoring, analytics, billing, ...
+- API gateway là 1 phần quan trọng của infrastructure, giúp chúng ta quản lý các request từ client, chuyển tiếp các request đến các microservices, và trả về kết quả cho client.
