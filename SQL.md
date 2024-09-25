@@ -326,3 +326,171 @@ DELETE FROM cities WHERE country = 'Vietnam';
   - RIGHT JOIN: Kết hợp dữ liệu từ bảng bên trái và bảng bên phải, bảng bên phải sẽ là bảng chính
   - FULL JOIN: Kết hợp dữ liệu từ cả 2 bảng
   - CROSS JOIN: Kết hợp mọi dòng từ bảng bên trái với mọi dòng từ bảng bên phải
+
+
+## Aggregate Functions
+- Aggregate Functions:
+  - COUNT: Đếm số lượng dòng.Vd:
+    ```sql
+    SELECT COUNT(*) FROM photos;
+    ```
+  - SUM: Tính tổng giá trị.Vd:
+  - AVG: Tính trung bình giá trị.Vd:
+  - MIN: Tìm giá trị nhỏ nhất.Vd:
+  - MAX: Tìm giá trị lớn nhất.Vd:
+- Combining Aggregate Functions:
+  ```sql
+  SELECT
+    user_id, MAX(id)
+  FROM
+    COMMENTS
+  GROUP BY
+    user_id;
+  ```
+  Check user_id nào có nhiều comment nhất:
+  ```sql
+  SELECT
+    user_id, COUNT(id) as num_comments_created
+  FROM
+    COMMENTS
+  GROUP BY
+    user_id;
+  ```
+- Khi chúng ta dếm thì cột đó phải là cột không chứa giá trị NULL, nếu không sẽ bị lỗi không trả ra đúng kết quả. Bản ghi sẽ không được đếm nếu cột đó chứa giá trị NULL. Chúng ta có thể sử dụng `COUNT(*)` để đếm tất cả các bản ghi kể cả NULL.
+- Đếm số lượng comment của mỗi bức ảnh:
+  ```sql
+  SELECT
+    photo_id, COUNT(id) as num_comments
+  FROM
+    COMMENTS
+  GROUP BY
+    photo_id;
+  ```
+- Filtering Grouped with HAVING:
+  - Để lọc dữ liệu sau khi đã nhóm, chúng ta sử dụng câu lệnh `HAVING`:
+    ```sql
+    SELECT
+      user_id, COUNT(id) as num_comments
+    FROM
+      COMMENTS
+    GROUP BY
+      user_id
+    HAVING
+      COUNT(id) > 20;
+    ```
+  - Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `user_id`, `COUNT(id) as num_comments`: Tên của các cột
+    - `FROM`: Tên của bảng
+    - `COMMENTS`: Tên của bảng
+    - `GROUP BY`: Nhóm dữ liệu
+    - `user_id`: Nhóm dữ liệu theo cột `user_id`
+    - `HAVING`: Lọc dữ liệu sau khi đã nhóm
+    - `COUNT(id) > 1`: Lọc các dòng có số lượng comment lớn hơn 1
+    - Thứ tự thực hiện: `FROM` -> `GROUP BY` -> `HAVING` -> `SELECT`
+  - Sự khác biệt giữa `WHERE` và `HAVING`:
+    - `WHERE` lọc dữ liệu trước khi nhóm
+    - `HAVING` lọc dữ liệu sau khi nhóm
+    - Thứ tự thực hiện: `FROM` -> `JOINS` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `SELECT`
+    - Bạn không thể sử dụng `HAVING` mà không có `GROUP BY`
+
+  -  ```sql
+      SELECT
+        photo_id,
+        COUNT(*)
+      FROM
+        comments
+      WHERE
+        photo_id < 3
+      GROUP BY
+        photo_id
+      HAVING
+        COUNT(*) > 2;
+      ```
+## Sorting Data
+- Sorting Data:
+  - Để sắp xếp dữ liệu, chúng ta sử dụng câu lệnh `ORDER BY`:
+    ```sql
+    SELECT * FROM products ORDER BY id;
+    SELECT * FROM products ORDER BY id DESC;
+    SELECT * FROM products ORDER BY id ASC;
+    SELECT * FROM products ORDER BY id DESC, user_id ASC;
+    ```
+  - Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `*`: Lấy tất cả các cột
+    - `FROM`: Tên của bảng
+    - `products`: Tên của bảng
+    - `ORDER BY`: Sắp xếp dữ liệu
+    - `id`: Sắp xếp dữ liệu theo cột `id`
+    - `DESC`: Sắp xếp dữ liệu theo thứ tự giảm dần
+    - `ASC`: Sắp xếp dữ liệu theo thứ tự tăng dần
+    - `id DESC, user_id ASC`: Sắp xếp dữ liệu theo cột `id` giảm dần, sau đó sắp xếp theo cột `user_id` tăng dần
+    - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `SELECT`
+  - Trường hợp sắp xếp 2 biến
+    ```sql
+    SELECT * FROM products ORDER price, weight;
+    ```
+    Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `*`: Lấy tất cả các cột
+    - `FROM`: Tên của bảng
+    - `products`: Tên của bảng
+    - `ORDER BY`: Sắp xếp dữ liệu
+    - `price, weight`: Sắp xếp dữ liệu theo cột `price`, sau đó sắp xếp theo cột `weight`
+  - Offset and Limit:
+    - Để phân trang dữ liệu, chúng ta sử dụng câu lệnh `OFFSET` và `LIMIT`:
+    ```sql
+    SELECT * FROM products ORDER BY id OFFSET 5 LIMIT 5;
+    ```
+    Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `*`: Lấy tất cả các cột
+    - `FROM`: Tên của bảng
+    - `products`: Tên của bảng
+    - `ORDER BY`: Sắp xếp dữ liệu
+    - `id`: Sắp xếp dữ liệu theo cột `id`
+    - `OFFSET 5`: Bỏ qua 5 dòng đầu tiên
+    - `LIMIT 5`: Lấy 5 dòng tiếp theo
+    - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `SELECT`
+## Union and Intersection with Sets
+- Union:
+  - Để kết hợp dữ liệu từ nhiều bảng, chúng ta sử dụng câu lệnh `UNION`:
+  ```sql
+  (SELECT * FROM products ORDER BY price DESC limit 5)
+  UNION
+  (SELECT * FROM products ORDER BY price/weight DESC limit 5);
+  ```
+  - Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `*`: Lấy tất cả các cột
+    - `FROM`: Tên của bảng
+    - `products`: Tên của bảng
+    - `ORDER BY`: Sắp xếp dữ liệu
+    - `price DESC`: Sắp xếp dữ liệu theo cột `price` giảm dần
+    - `price/weight DESC`: Sắp xếp dữ liệu theo cột `price/weight` giảm dần
+    - `LIMIT 5`: Lấy 5 dòng
+    - `UNION`: Kết hợp dữ liệu từ 2 bảng
+    - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `UNION` -> `SELECT`
+    - Trả về tất cả dòng dữ liệu từ cả 2 bảng, loại bỏ các dòng trùng lặp
+  - Nếu 2 query khác nhau về cấu trúc, chúng ta cần sử dụng `UNION ALL` thay vì `UNION`
+- Intersection:
+  - Để lấy dữ liệu chung từ 2 bảng, chúng ta sử dụng câu lệnh `INTERSECT`:
+  ```sql
+  (SELECT * FROM products ORDER BY price DESC limit 5)
+  INTERSECT
+  (SELECT * FROM products ORDER BY price/weight DESC limit 5);
+  ```
+  - Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `*`: Lấy tất cả các cột
+    - `FROM`: Tên của bảng
+    - `products`: Tên của bảng
+    - `ORDER BY`: Sắp xếp dữ liệu
+    - `price DESC`: Sắp xếp dữ liệu theo cột `price` giảm dần
+    - `price/weight DESC`: Sắp xếp dữ liệu theo cột `price/weight` giảm dần
+    - `LIMIT 5`: Lấy 5 dòng
+    - `INTERSECT`: Lấy dữ liệu chung từ 2 bảng
+    - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `INTERSECT` -> `SELECT`
+    - Trả về các dòng dữ liệu chung từ cả 2 bảng
+## Subqueries
