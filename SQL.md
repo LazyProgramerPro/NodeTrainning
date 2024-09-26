@@ -494,3 +494,101 @@ DELETE FROM cities WHERE country = 'Vietnam';
     - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `INTERSECT` -> `SELECT`
     - Trả về các dòng dữ liệu chung từ cả 2 bảng
 ## Subqueries
+
+## ACID Properties
+- ACID Properties:
+  - Atomicity: Tất cả các thao tác trong một giao dịch phải được thực hiện hoặc không được thực hiện.
+  - Consistency: Dữ liệu phải luôn ổn định sau khi thực hiện một giao dịch.
+  - Isolation: Một giao dịch không bị ảnh hưởng bởi các giao dịch khác.
+  - Durability: Dữ liệu đã được lưu trữ phải được bảo vệ khỏi sự mất mát.
+- Transactions:
+  - Là 1 tập hợp các câu truy vấn SQL, mỗi câu truy vấn được coi là 1 đơn vị công việc vì đôi khi 1 câu truy vấn rất khó để đạt được kêt quả mong muốn, có đôi lúc điều đó là không thể
+    - VD: Chuyển tiền từ tài khoản A sang tài khoản B, cần thực hiện 2 câu truy vấn: Trừ tiền từ tài khoản A và cộng tiền vào tài khoản B và trước đó cần kiểm tra xem tài khoản A có đủ tiền không, kiểm tra tài khoản B có tồn tại không,....
+  - Để bắt đầu 1 giao dịch, chúng ta sử dụng câu lệnh `BEGIN` hoặc `START TRANSACTION`
+    - Nếu bạn có 1000 câu truy vấn, tất cả 1000 thay đổi này sẽ được ghi vào bộ nhớ đệm và không được lưu vào cơ sở dữ liệu cho đến khi bạn sử dụng câu lệnh `COMMIT` hay sẽ lưu luôn sau mỗi câu truy vấn ???
+  - Để kết thúc 1 giao dịch, chúng ta sử dụng câu lệnh `COMMIT` hoặc `ROLLBACK`
+    - Nếu bạn sử dụng câu lệnh `COMMIT`, tất cả các thay đổi sẽ được lưu vào cơ sở dữ liệu
+    - Nếu bạn sử dụng câu lệnh `ROLLBACK`, tất cả các thay đổi sẽ bị hủy và không được lưu vào cơ sở dữ liệu
+    - Trường hợp transaction unexpected error = `ROLLBACK`
+  - Thông thường các transaction được dùng để thay đổi và sửa đổi dữ liệu ?!? Trong trường hợp đọc dữ liệu thì không cần dùng transaction nhưng nếu dùng thì chúng ta đang làm việc với 1 bản sao của dữ liệu và không phải dữ liệu thật sự, nếu có điều gì đó thay đổi đồng thời với transaction thì bạn không quan tâm.
+  - VD: Acount 1 có 1000$ và Account 2 có 2000$, chuyển 500$ từ Account 1 sang Account 2.
+    - Bắt đầu 1 giao dịch
+    ```sql
+    BEGIN;
+    ```
+    - Lấy ra số dư của Account 1
+    ```sql
+    SELECT balance FROM accounts WHERE id = 1;
+    ```
+    - So sánh số dư của Account 1 với số tiền cần chuyển
+    - Trừ số tiền cần chuyển từ Account 1
+    ```sql
+    UPDATE accounts SET balance = balance - 500 WHERE id = 1;
+    ```
+    - Cộng số tiền cần chuyển vào Account 2
+    ```sql
+    UPDATE accounts SET balance = balance + 500 WHERE id = 2;
+    ```
+    - Commit transaction
+    ```sql
+    COMMIT;
+    ```
+- Atomicity:
+  - Atomicity đảm bảo rằng tất cả các thao tác trong một transaction phải được thực hiện hoặc không được thực hiện.
+    - VD: Chuyển tiền từ tài khoản A sang tài khoản B, nếu một trong các thao tác thất bại, tất cả các thao tác khác cũng sẽ bị hủy.
+  - Nếu trong trường hợp Database bị mất điện(hỏng), thì tất cả các thao tác chưa được lưu vào cơ sở dữ liệu sẽ bị hủy. Trong trường hợp đang commit dở thì sẽ rollback lại.
+  - CSDL sẽ tự động phát hiện và rollback lại các thao tác chưa được lưu vào cơ sở dữ liệu.
+  - VD: 
+      ```sql
+      UPDATE accounts SET balance = balance - 500 WHERE id = 1;
+      -- Database crash
+      ```
+    - Nếu trường hợp làm kém (không dùng transaction) thì số tiền sẽ bị trừ nhưng không được cộng vào tài khoản B ==> Đó là 1 điều cực kỳ nguy hiểm. Đây là 1 hành động không nhất quán, bạn không thể kiểm soát được dữ liệu của mình.
+    - Một actomicity transaction sẽ rollback lại toàn bộ thao tác nếu có bất kỳ lỗi nào xảy ra.
+- Isolation:
+  - Isolation đảm bảo rằng một transaction không bị ảnh hưởng bởi các transaction khác.
+  - Khi chúng ta thực hiện nhiều transaction cùng 1 lúc, chúng ta cần đảm bảo rằng mỗi transaction không bị ảnh hưởng bởi các transaction khác.
+  - Điều gì sẽ xảy ra nếu tôi đang thực hiện 1 transaction và đang truy vấn đọc, đọc và 1 số transaction đã đc `COMMIT` ? Câu hỏi là chúng ta sẽ đọc được dữ liệu mới hay dữ liệu cũ ? Điều này sẽ tạo ra 1 số vấn đề như:
+    - Dirty Read: Đọc dữ liệu chưa được commit của transaction khác.
+    - Non-Repeatable Read: Đọc dữ liệu đã bị thay đổi bởi transaction khác.
+    - Phantom Read: Đọc dữ liệu mới được thêm vào bởi transaction khác.
+  - Có 4 cấp độ cô lập:
+    - Read Uncommitted: Một transaction có thể đọc dữ liệu chưa được commit của transaction khác.
+    - Read Committed: Một transaction chỉ có thể đọc dữ liệu đã được commit của transaction khác.
+    - Repeatable Read: Một transaction không thể đọc dữ liệu đã bị thay đổi bởi transaction khác.
+    - Serializable: Một transaction không thể đọc hoặc thay đổi dữ liệu đã bị thay đổi bởi transaction khác.
+    - Snapshot: Một transaction không thể đọc hoặc thay đổi dữ liệu đã bị thay đổi bởi transaction khác.
+  - VD:
+    - Transaction 1: Chuyển 500$ từ tài khoản A sang tài khoản B
+    - Transaction 2: Chuyển 100$ từ tài khoản A sang tài khoản B
+    - Nếu Transaction 1 chưa hoàn thành, Transaction 2 không được thực hiện cho đến khi Transaction 1 hoàn thành.
+  - Database Implementations:
+    - PostgreSQL: Sử dụng cấp độ cô lập `Read Committed` mặc định.
+    - MySQL: Sử dụng cấp độ cô lập `Repeatable Read` mặc định.
+    - Oracle: Sử dụng cấp độ cô lập `Serializable` mặc định.
+    - SQL Server: Sử dụng cấp độ cô lập `Read Committed` mặc định.
+- Consistency(Tính nhất quán):
+  - Consistency đảm bảo rằng dữ liệu phải luôn ổn định sau khi thực hiện một transaction.
+  - Consistency in Data: Thể hiện trạng thái dữ liệu sau khi thực hiện một transaction.
+  - Consistency in reads: Dữ liệu có thể nhất quán trên data, nhưng có thê không nhất quán trên reads do chúng có nhiều phiên bản và chúng hơi không đồng bộ (VD như data và data cache, có thể mất do dùng transaction nhưng server bị lỗi mà chưa kịp rollback).
+  - VD: Chuyển 500$ từ tài khoản A sang tài khoản B, nếu tài khoản A có 1000$ thì tài khoản B phải có 500$.
+  - Nếu một transaction thất bại, dữ liệu phải được rollback lại.
+  - Nếu một transaction thành công, dữ liệu phải được commit.
+- Durability:
+  - Durability đảm bảo rằng dữ liệu đã được lưu trữ phải được bảo vệ khỏi sự mất mát.
+## Database Internals
+## Database Indexes
+## Database Normalization
+## Database Denormalization
+## Database Sharding
+## Database Replication
+## Database Partitioning
+## Database Backup and Recovery
+## Database Security
+## Database Performance Tuning
+## Database Monitoring
+## Database Design Patterns
+## Database Design Tools
+## Database Migration
+## Database Version Control
+## Database Deployment
