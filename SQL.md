@@ -577,10 +577,14 @@ DELETE FROM cities WHERE country = 'Vietnam';
 - Durability:
   - Durability đảm bảo rằng dữ liệu đã được lưu trữ phải được bảo vệ khỏi sự mất mát.
 ## Database Internals
+- Table là 1 cấu trúc dữ liệu chứa dữ liệu, mỗi table chứa nhiều dòng và mỗi dòng chứa nhiều cột.
+- RowID: Là 1 cột ẩn mà mỗi dòng trong table có 1 giá trị duy nhất.
+- Page: Là 1 phần của table, mỗi page chứa nhiều dòng.
 ## Database Indexes
 ## Database Normalization
 ## Database Denormalization
 ## Database Sharding
+## Concurency Control
 ## Database Replication
 ## Database Partitioning
 ## Database Backup and Recovery
