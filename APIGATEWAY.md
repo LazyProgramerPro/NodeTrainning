@@ -97,3 +97,113 @@ Cache như 1 bộ nhớ lưu trữ bản sao của các dữ liệu được c�
 - DNS là gì? Tại sao chúng ta cần sử dụng DNS?
 - DNS là Domain Name System, là 1 hệ thống dùng để chuyển đổi tên miền thành địa chỉ IP. DNS giúp chúng ta truy cập vào trang web từ tên miền, giúp chúng ta truy cập vào trang web từ địa chỉ IP, giúp chúng ta truy cập vào trang web từ máy tính, và giúp chúng ta truy cập vào trang web từ mạng.
 - DNS có 2 loại là DNS server và DNS client. DNS server là máy chủ chứa dữ liệu DNS, và DNS client là máy tính truy cập vào dữ liệu DNS. DNS server có nhiều loại như: Root server, TLD server, Authoritative server, và Recursive server.
+
+
+# GraphQL vs RESTful API
+- GraphQL là gì? Tại sao chúng ta cần sử dụng GraphQL?
+  - GraphQL là 1 ngôn ngữ truy vấn dùng để truy vấn dữ liệu từ máy chủ. GraphQL giúp chúng ta truy vấn dữ liệu từ máy chủ, giúp chúng ta truy vấn dữ liệu từ nhiều máy chủ, giúp chúng ta truy vấn dữ liệu từ nhiều nguồn dữ liệu, và giúp chúng ta truy vấn dữ liệu từ nhiều nguồn dữ liệu khác nhau.
+  - Do Meta phát triển
+  - Nó cung cấp sơ đồ dữ liệu và cung cấp cho khách hàng chính xác những gì họ cần
+  - GraphQL nằm giữa client và server, nó có thể tổng hợp nhiều yêu cầu tài nguyên thành 1 truy vấn duy nhất
+  - Nó cũng hỗ trợ Mutation, Subscription
+    - Mutation: Thay đổi dữ liệu
+    - Subscription: Theo dõi sự kiện
+  - Trong thực tế thì cả GraphQL và RESTful API đều gửi yêu cầu HTTP và nhận phản hồi HTTP
+    - Restful API: Rest tập trung vào tài nguyên, mỗi tài nguyên có 1 URI, và các phương thức HTTP như GET, POST, PUT, DELETE
+    - GraphQL: GraphQL tập trung vào dữ liệu, mỗi truy vấn GraphQL có 1 URI, và các truy vấn GraphQL như Query, Mutation, Subscription
+  - Với GraphQL, chúng ta có thể chỉ định những tài nguyên mà chúng ta muốn cũng như những field mà chúng ta muốn
+    VD: 
+    ```graphql
+    query {
+      user(id: 1) {
+        id
+        name
+        email
+      }
+    }
+    ```
+
+  - Chúng ta có thể gửi 1 truy vấn phức tạp để tìm nạp những dữ liệu bổ sung theo các mối quan hệ được xác định trong sơ đồ dữ liệu
+    VD:
+    ```graphql
+    query {
+      user(id: 1) {
+        id
+        name
+        email
+        posts {
+          id
+          title
+          content
+        }
+      }
+    }
+    ``` 
+  - Nhược điểm:
+    - Yêu cầu các công cụ hỗ trợ nặng hơn ở cả máy khách và máy chủ (Apollo, Relay,GraphiQL) => Cần học thêm nhiều thứ, và các chi phí này đều không đáng có đối với các API CRUD đơn giản
+    - Khó khăn trong việc xử lí Cache:
+      - REST sử dụng HTTP GET để tìm nạp dữ liệu, nó dễ dàng lưu trữ dữ liệu vào cache và được các trình duyệt, CDN, và các proxy và các máy chủ web tận dụng
+      - GraphQL có 1 điểm truy cập duy nhất và nó sử dụng HTTP POST theo mặc định=> Khó khăn trong việc xử lí cache
+
+- REST:
+  - Là tiêu chuẩn giao tiếp phổ biến nhất giữa các máy tính thông qua internet
+  - API là viêt tắt của Application Programming Interface, là 1 tập hợp các quy tắc và cơ chế mà các phần mềm ứng dụng có thể tuân thủ để giao tiếp với nhau
+  - REST là viết tắt của Representational State Transfer, là 1 kiến trúc dựa trên web, nó sử dụng các phương thức HTTP như GET, POST, PUT, DELETE để thực hiện các thao tác CRUD(Create, Read, Update, Delete) trên tài nguyên
+  - RESTful API là 1 kiến trúc API dựa trên REST
+  - REST là 1 bộ quy tắc:
+    - Uniform Interface: Mỗi tài nguyên có 1 URI, và các phương thức HTTP như GET, POST, PUT, DELETE
+    - Client-Server: Client và Server độc lập với nhau, và có thể phát triển mà không ảnh hưởng đến nhau
+    - Stateless: Mỗi request từ client đều phải chứa đủ thông tin cần thiết, và không cần lưu trạng thái trước đó
+    - Cacheable: Dữ liệu từ server có thể được lưu vào cache để tăng tốc độ truy cập dữ liệu
+    - Layered System: Có thể sử dụng nhiều lớp trung gian như Proxy, Gateway, và Cache để tăng hiệu suất và bảo mật
+    - Code on Demand: Server có thể gửi mã nguồn cho client để thực thi
+  - Thiết kết Restful API:
+  - Hoạt động tốt khi bạn cần những thứ đơn giản, thống nhất giữa các dịch vụ riêng biệt
+  - Cache dễ dàng
+  Nhược điểm:
+  - REST không thể truy vấn dữ liệu theo nhu cầu
+  - Cần nhiều request để lấy dữ liệu, hoặc tập hợp dữ liệu từ nhiều nguồn
+  ![alt text](image-2.png)
+
+# Webhook
+- Webhook là gì? Tại sao chúng ta cần sử dụng Webhook?
+- Webhook là 1 cơ chế để gửi thông báo từ máy chủ đến máy khách, thông báo này được gửi tự động khi có sự kiện xảy ra.
+  ![alt text](image-3.png)
+  - Stripe: Khi có 1 giao dịch thành công, Stripe sẽ gửi thông báo đến máy khách thông qua Webhook
+  - Chúng ta có thể dùng những cách cũ như Polling, Long Polling, nhưng những cách này đều không hiệu quả và tốn kém:
+    - Polling: Máy khách gửi yêu cầu đến máy chủ mỗi 1 khoảng thời gian nhất định, và máy chủ trả về kết quả cho máy khách.
+    - Long Polling: Máy khách gửi yêu cầu đến máy chủ, và máy chủ giữ kết nối mở cho máy khách cho đến khi có dữ liệu mới, sau đó máy chủ trả về kết quả cho máy khách.
+    ![alt text](image-4.png)
+    ![alt text](image-5.png)
+  - Với Webhook:
+  ![alt text](image-6.png)
+    - Sau khi Stripe xử lí xong thanh toán nó sẽ gọi lại URL được chỉ định của bạn để gửi bản cập nhập về trạng thái của thanh toán
+  - Còn được gọi là Reverse API hoặc HTTP push API: Máy chủ liên hệ với máy khách
+  - Tips:
+    - Áp dụng cơ chế thăm dò tự động để phát hiện webhook không hoạt động
+    - Bảo mật webhook bằng cách sử dụng mã xác thực, mã chữ ký số, mã xác thực, mã chứng thực, mã bảo mật, mã token, mã bí mật, mã khóa, mã hóa, và nhiều cách khác.
+    - Make sure that the webhook is idempotent: Đảm bảo rằng webhook là idempotent, nghĩa là nó không thay đổi trạng thái của hệ thống nếu được gọi nhiều lần.
+    - Webhook overload: Đảm bảo rằng webhook không quá tải, nghĩa là nó không gửi quá nhiều thông báo trong 1 khoảng thời gian nhất định. Sử dụng hàng đợi để xử lý webhook, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    -  Điều gì sẽ xảy ra nếu PSP không bao giờ gọi lại? Chúng ta có thể thiết lập công việc dọn phòng để kiểm tra tình trạng thanh toán hàng giờ.
+![alt text](image-7.png)
+
+# API Performance
+- Tối ưu hóa hiệu suất API là quá trình tối ưu hóa hiệu suất của API, giúp chúng ta tăng tốc độ tải trang, giảm thời gian phản hồi, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+- Optimize không phải là bước đầu tiên trong quy trình của bạn. Nó có tính năng mạnh mẽ nhưng có thể dẫn đến những sự phức tạp không cần thiết. Hãy chắc chắn rằng bạn đã xác định rõ vấn đề trước khi tối ưu hóa.
+- 7 cách tối ưu:
+  - Caching: Caching giúp chúng ta lưu trữ dữ liệu tạm thời, giảm thời gian truy cập dữ liệu từ ổ cứng hoặc từ mạng, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Nếu bạn truy cập vào 1 endpoint nhiều lần, hãy lưu trữ dữ liệu vào cache để giảm thời gian truy cập dữ liệu từ máy chủ.
+  - Connection Pooling: Connection pooling giúp chúng ta tạo ra và duy trì các kết nối đến máy chủ, giúp chúng ta tăng tốc độ tải trang, giảm thời gian phản hồi, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Tránh tạo các mở đóng kết nối đến máy chủ nhiều lần, hãy sử dụng connection pooling để tạo ra và duy trì các kết nối đến máy chủ (RDS Proxy, PgBouncer, ProxySQL, ...)
+  - Avoid N+1 Queries: N+1 queries là 1 vấn đề xảy ra khi chúng ta gửi nhiều truy vấn đến máy chủ, điều này dẫn đến tăng tải cho máy chủ, giảm hiệu suất của hệ thống, và tăng thời gian phản hồi cho người dùng.
+    - Tránh gửi nhiều truy vấn đến máy chủ, hãy gửi 1 truy vấn duy nhất chứa tất cả dữ liệu cần thiết.
+  - Pagination: Pagination giúp chúng ta phân trang dữ liệu, giúp chúng ta tăng tốc độ tải trang, giảm thời gian phản hồi, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Tránh gửi tất cả dữ liệu trong 1 truy vấn, hãy phân trang dữ liệu và gửi từng trang dữ liệu mỗi lần.
+  - Compression: Compression giúp chúng ta nén dữ liệu trước khi gửi dữ liệu từ máy chủ đến máy khách, giúp chúng ta giảm thời gian truy cập dữ liệu từ mạng, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Nén dữ liệu trước khi gửi dữ liệu từ máy chủ đến máy khách, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+  - Lightweight Serialization: Lightweight serialization giúp chúng ta chuyển đổi dữ liệu từ dạng cấu trúc dữ liệu sang dạng chuỗi, giúp chúng ta giảm thời gian truy cập dữ liệu từ ổ cứng hoặc từ mạng, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Sử dụng các định dạng như JSON, XML, và Protobuf để chuyển đổi dữ liệu từ dạng cấu trúc dữ liệu sang dạng chuỗi.
+  - Asynchronous Logging: Đẩy log vào hàng đợi để xử lý sau, giảm thời gian phản hồi, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+    - Đẩy log vào hàng đợi để xử lý sau, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+  - Rate Limiting: Rate limiting giúp chúng ta giới hạn số lượng yêu cầu được gửi đến máy chủ, giúp chúng ta giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
+![alt text](image-8.png)
