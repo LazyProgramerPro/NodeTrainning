@@ -23,6 +23,8 @@
 - Ngoài luồng chính nếu ok ra thì trả về kết quả cho client, nếu có lỗi thì trả về lỗi cho client, circuit breaker, retry, timeout, fallback, cache, logging, monitoring, analytics, billing, ...
 - API gateway là 1 phần quan trọng của infrastructure, giúp chúng ta quản lý các request từ client, chuyển tiếp các request đến các microservices, và trả về kết quả cho client.
 
+![alt text](image-9.png)
+
 # System Design
 
 - Vertical scaling: Thay đổi kích thước của máy chủ, thường là tăng RAM, CPU, hoặc ổ cứng. Nếu trường hợp có nhiều request đến, thì chúng ta cần tăng kích thước của máy chủ.Điều này rất dễ cũng như tiết kiệm chi phí nhưng có rất nhiều hạn chế.
@@ -207,3 +209,41 @@ Cache như 1 bộ nhớ lưu trữ bản sao của các dữ liệu được c�
     - Đẩy log vào hàng đợi để xử lý sau, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
   - Rate Limiting: Rate limiting giúp chúng ta giới hạn số lượng yêu cầu được gửi đến máy chủ, giúp chúng ta giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
 ![alt text](image-8.png)
+# Design API
+![alt text](image-10.png)
+
+# Load Balancer
+
+# Top 5 Most Used Architecture Patterns
+- Layered Architecture: Kiến trúc lớp là 1 kiến trúc phần mềm mà các thành phần của hệ thống được chia thành các lớp khác nhau, mỗi lớp có 1 trách nhiệm cụ thể, và các lớp giao tiếp với nhau thông qua giao diện cố định.
+  - Presentation Layer: Lớp trình bày, hiển thị dữ liệu cho người dùng, và nhận dữ liệu từ người dùng.
+  - Business Layer: Lớp kinh doanh, xử lý logic kinh doanh, và gửi dữ liệu đến lớp truy cập dữ liệu.
+  - Data Access Layer: Lớp truy cập dữ liệu, truy cập dữ liệu từ cơ sở dữ liệu, và gửi dữ liệu đến lớp kinh doanh.
+  - Database Layer: Lớp cơ sở dữ liệu, lưu trữ dữ liệu, và cung cấp dữ liệu cho lớp truy cập dữ liệu.
+
+  ![alt text](image-11.png)
+
+- Event-Driven Architecture: Kiến trúc dựa trên sự kiện là 1 kiến trúc phần mềm mà các thành phần của hệ thống giao tiếp với nhau thông qua sự kiện, và không thông qua giao diện cố định.
+  - Publisher: Người xuất bản, tạo ra sự kiện, và gửi sự kiện đến hàng đợi sự kiện.
+  - Queue: Hàng đợi, lưu trữ sự kiện, và gửi sự kiện đến người đăng ký.
+  - Subscriber: Người đăng ký, nhận sự kiện, xử lý sự kiện, và gửi sự kiện đến hệ thống khác.
+
+  ![alt text](image-12.png)
+
+  - CQRS: Command Query Responsibility Segregation, là 1 kiến trúc phần mềm mà các truy vấn và lệnh được chia thành 2 phần riêng biệt, mỗi phần có 1 trách nhiệm cụ thể, và các phần giao tiếp với nhau thông qua giao diện cố định.
+    - Command: Lệnh, thay đổi trạng thái của hệ thống, và gửi dữ liệu đến lớp truy cập dữ liệu.
+    - Query: Truy vấn, truy vấn dữ liệu từ hệ thống, và gửi dữ liệu đến lớp trình bày.
+
+    ![alt text](image-13.png)
+
+- Microkernel Architecture: Kiến trúc nhân nhỏ là 1 kiến trúc phần mềm mà các thành phần của hệ thống được chia thành các nhân nhỏ, mỗi nhân nhỏ có 1 trách nhiệm cụ thể, và các nhân nhỏ giao tiếp với nhau thông qua giao diện cố định.
+  - Core: Nhân, chứa logic chính của hệ thống, và gửi dữ liệu đến các nhân khác.
+  - Plugin: Plugin, chứa logic phụ của hệ thống, và gửi dữ liệu đến nhân.
+
+- Microservices Architecture
+- Monolithic Architecture
+
+# How to Choose The Right Databases
+- Lựa chọn sai lầm sẽ dẫn đến thời gian ngừng hoạt động kéo dài, tác động tiêu cực đến khách hàng và thậm chí là mất dữ liệu
+![alt text](image-14.png)
+https://www.youtube.com/watch?v=kkeFE6iRfMM
