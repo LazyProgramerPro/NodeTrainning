@@ -157,6 +157,18 @@
 ![alt text](image-19.png)
 ![alt text](image-20.png)
 
+- SSH into EC2 instance: Để SSH vào instance, bạn cần sử dụng private key của key pair.
+    - Bước 1: Mở terminal.
+    - Bước 2: Sử dụng lệnh chmod để cấp quyền cho private key.
+    - Bước 3: Sử dụng lệnh ssh để SSH vào instance.
+    - Ví dụ: ssh -i key.pem ec2-user@public-ip
+
+
+
+
+
+<!-- ===================== -->
+
 
 - Target Groups Node and Health
 ![alt text](image-21.png)
