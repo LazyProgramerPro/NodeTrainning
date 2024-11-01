@@ -38,3 +38,38 @@
 ![alt text](image-142.png)
 - Which Services Does AWS Offer?
 ![alt text](image-143.png)
+
+# AWS Account Security, Permissions, and Policies
+- AWS Security Model:
+    - Shared Responsibility Model : Nguyên tắc cơ bản là bảo mật. Ý tưởng đơn giản là AWS chịu trách nhiệm về việc bảo mật về những thứ bạn có thể kiểm soát. Phần lớn chúng là cơ sở hạ tầng, máy móc vật lí. Bạn chịu trách nhiệm về đơn đăng kí của mình và khối lượng công việc bạn đưa lên đó cũng như bạn sẽ chịu trách nhiệm về việc bảo vệ tài khoản của mình và các thông tin kết nối![alt text](image-144.png)
+- Protecting Your Account![alt text](image-145.png)
+- What Is IAM?
+    - IAM là Identity and Access Management
+    - IAM là dịch vụ quản lý người dùng, nhóm và quyền truy cập trong AWS
+    - IAM cho phép bạn quản lý quyền truy cập vào tài nguyên AWS của bạn
+    - IAM là dịch vụ miễn phí
+    - https://aws.amazon.com/iam/
+    - Indetity chỉ đơn giản là 
+    ![alt text](image-146.png)
+- Users, Groups, Roles, and Policies
+    - Users: Người dùng, là những thực thể được tạo trong tk AWS và thường được người dùng tạo ra cho mọi người dùng có thể truy cập tài khoản AWS của họ. Điều đó có thể kiểm soát những gì người dùng có thể làm trong tài khoản AWS của họ
+    - Groups: Nhóm, Những người có chung những quyền truy cập vào tài nguyên AWS. Bạn có thể thêm hoặc xóa người dùng từ nhóm, bạn cũng có thể thêm hoặc xóa quyền truy cập từ nhóm. Về cơ bản bạn có thể đặt quyền cho toàn bộ nhóm và mỗi người dùng được thêm vào nhóm sẽ có cùng 1 quyền. Điều này tránh tạo ra việc sao chép lại quá nhiều quyền không cần thiết
+    - Roles: Vai trò, là cách bạn cung cấp quyền truy cập vào tài nguyên AWS cho các thực thể khác nhau. Ví dụ bạn có thể cung cấp quyền truy cập vào tài nguyên AWS cho 1 dịch vụ khác như EC2, Lambda, S3, ...![alt text](image-147.png)
+- Understanding Roles
+![alt text](image-148.png)
+![alt text](image-149.png)
+
+- Policies Are Combined
+![alt text](image-150.png)
+- What Happens If Permissions Clash?
+![alt text](image-151.png)
+![alt text](image-152.png)
+- Explicit DENY Statements Always Win!
+![alt text](image-153.png)
+- Core IAM Policy & Permission Rules
+![alt text](image-154.png)
+- When Are Permissions Evaluated?
+![alt text](image-155.png)
+![alt text](image-156.png)
+- Summary
+![alt text](image-157.png)
