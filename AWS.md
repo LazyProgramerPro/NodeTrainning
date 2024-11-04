@@ -73,3 +73,27 @@
 ![alt text](image-156.png)
 - Summary
 ![alt text](image-157.png)
+# Compute Services: EC2 
+![alt text](image-158.png)
+- What Are “Containers”?![alt text](image-159.png)
+    - Containers là 1 cách để đóng gói ứng dụng và tất cả các phần mềm cần thiết để chạy ứng dụng đó. Containers giúp ứng dụng chạy đúng cách khi chuyển từ môi trường phát triển sang môi trường sản xuất
+    - Containers giúp ứng dụng chạy đúng cách khi chuyển từ môi trường phát triển sang môi trường sản xuất
+    - ECS/EKS là dịch vụ quản lý containers của AWS. ECS là Elastic Container Service, EKS là Elastic Kubernetes Service
+- What Are “Serverless” Services?![alt text](image-160.png)
+    - Serverless là 1 mô hình tính toán mà bạn không cần quản lý cơ sở hạ tầng. Bạn chỉ cần tập trung vào việc viết mã và chạy mã của bạn
+    - Lambda là dịch vụ serverless của AWS
+- Understanding EC2
+![alt text](image-161.png)
+![alt text](image-162.png)
+![alt text](image-163.png)
+- Amazon Machine Images (AMIs)
+![alt text](image-164.png)
+- EC2 Pricing
+![alt text](image-165.png)
+- Summary
+![alt text](image-166.png)
+
+*** Doc cty : ***
+*** Doc EC2 Notion : ***
+
+# VPCs & Multiple EC2 Instances
