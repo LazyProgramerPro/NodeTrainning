@@ -97,3 +97,69 @@
 *** Doc EC2 Notion : ***
 
 # VPCs & Multiple EC2 Instances
+
+- Để xây dựng 1 ứng dụng phức tạp, bạn cần nhiều EC2 instances. Để chúng có thể giao tiếp với nhau, bạn cần 1 mạng riêng biệt cho chúng. Đó chính là VPC
+- Bạn muốn chi tiết trường hợp nào được kết nối với Internet theo cách nào và những trường hợp nào là không nên,
+- Khi bạn muốn chạy 1 instance EC2, bạn cần chọn 1 VPC và 1 subnet
+![alt text](image-167.png)
+- Những Security Group và Network Access Control List (NACL) là gì?
+    - Security Group: Là 1 bảng điều khiển truy cập mạng cho 1 hoặc nhiều instance EC2. Bạn có thể kiểm soát traffic đến và đi từ instance EC2 bằng cách chỉ định các rule trong security group
+    - Network Access Control List (NACL): Là 1 bảng điều khiển truy cập mạng cho 1 hoặc nhiều subnet. Bạn có thể kiểm soát traffic đến và đi từ subnet bằng cách chỉ định các rule trong NACL
+![alt text](image-168.png)
+- Ý tưởng là bạn có thể có nhiều các trường hợp mà bạn có thể nhóm thành 1 hoặc nhiều VPC, mỗi VPC có thể chứa nhiều EC2
+![alt text](image-169.png)
+![alt text](image-170.png)
+- VPCs & Subnets
+    - VPC là Virtual Private Cloud, là 1 môi trường mạng ảo mà bạn tạo trong AWS. Bạn có thể chọn IP address range, tạo subnet, tạo route tables, và cấu hình các rule cho security group và NACL
+    - Subnet là 1 phần của VPC mà bạn chia ra để chia sẻ IP address range của VPC. Bạn có thể chia subnet ra thành nhiều subnet nhỏ hơn
+    - Trong subnet bạn có thể kiểm soát cài đặt các yêu cầu mạng hay nói chính xác hơn là khả năng kết nối của các mạng con đó
+    - Bạn có thể kiểm soát mạng con ở chế độ private or public
+    VD: Các công ty tư nhân chỉ có quyền truy cập vào các mạng con nội bộ private,trong khi các mạng con public có thể truy cập từ bên ngoài vào Internet
+- Tất cả các phiên bản trong VPC đều có thể giao tiếp với nhau 1 cách độc lập cho dù chúng có nằm trên 1 mạng con hay không, nhưng với mạng con bạn có thể thực sự kiểm soát các phiên bản có thể thực sự kết nối với Internet hay không
+- Khi chúng chia thành các mạng con bạn có thể sẵn sàng chọn AZs khác nhau cho mỗi mạng con và các phiên bản trong mạng con đó sẽ cùng nằm trong AZ đó
+- Khi chúng ta có 1 mạng con public, chúng ta cần 1 Internet Gateway để kết nối với Internet
+- Khi chúng ta có 1 mạng con private, chúng ta cần 1 NAT Gateway để kết nối với Internet
+- NAT Gateway là 1 dịch vụ AWS cho phép các phiên bản trong mạng con private kết nối với Internet
+![alt text](image-171.png)
+- Việc chọn Region là rất quan trọng, vì nó ảnh hưởng đến việc chọn VPC, Subnet, và các tài nguyên khác
+- Tóm lại:
+    - VPC là nơi bạn khỏi chạy các phiên bản EC2 và sau đó trong các dịch vụ này bạn sắp xếp các phiên bản vào các mạng con
+    - Bạn phải chạy các EC2 instances trong các mạng con và sau đó bạn sẽ kiểm soát các phiên bản đó bằng cách sử dụng Security Group và NACL
+- Understanding CIDR IP Ranges
+    - CIDR là Classless Inter-Domain Routing
+    - CIDR là 1 cách để chỉ định IP address range
+    - CIDR sử dụng 1 số và 1 dấu / để chỉ định IP address range
+    - VD:![alt text](image-172.png)
+    - IP address range là 1 dãy các IP address mà bạn có thể sử dụng trong VPC, mỗi IP address là 1 số duy nhất và được gắn với 1 máy chủ hoặc 1 thiết bị mạng, mỗi IP address có thể được sử dụng để xác định 1 máy chủ hoặc 1 thiết bị mạng trên mạng Internet
+    - IP trong VPC có thể gắn với các instance EC2, Elastic Load Balancer, và các dịch vụ khác
+    - Ví dụ gửi dữ liệu từ phiên bản máy chủ EC2 web vào CSDL EC2, bạn có thể sử dụng địa chỉ IP nội bộ và các địa chỉ này đã được tạo khi chúng ta tạo VPC
+    ![alt text](image-173.png)
+
+- Understanding Route Tables
+    - Route Tables là 1 bảng điều khiển mạng cho 1 hoặc nhiều subnet
+    - Route Tables xác định cách mà traffic được điều hướng trong VPC
+- IP Public và Private
+![alt text](image-180.png)
+    - IP Public là IP address mà bạn có thể truy cập từ Internet
+    - IP Private là IP address mà bạn không thể truy cập từ Internet
+    - IP Private được sử dụng để giao tiếp giữa các instance EC2 trong VPC
+    - IP Public được sử dụng để giao tiếp với Internet
+- Elasstic IP
+    - Elastic IP là IP address tĩnh mà bạn có thể gán cho instance EC2
+    - Elastic IP giúp bạn giữ IP address không thay đổi khi bạn khởi động lại instance EC2
+    ![alt text](image-174.png)
+    ![alt text](image-175.png)
+- NACL
+![alt text](image-176.png)
+
+- VPC Peering & Transit Gateways
+    - VPC Peering là 1 cách để kết nối 2 VPC với nhau
+    - Transit Gateway là 1 cách để kết nối nhiều VPC với nhau
+    ![alt text](image-177.png)
+- VPC Endpoints & AWS PrivateLink
+    - VPC Endpoints là 1 cách để kết nối VPC với dịch vụ AWS mà không cần sử dụng Internet
+    - AWS PrivateLink là 1 cách để kết nối VPC với dịch vụ AWS mà không cần sử dụng Internet
+    - Ví dụ khi bạn muốn kết nối VPC với S3, bạn có thể sử dụng VPC Endpoint hoặc AWS PrivateLink để kết nối mà không cần sử dụng Internet
+    ![alt text](image-178.png)
+- Summary
+![alt text](image-179.png)
