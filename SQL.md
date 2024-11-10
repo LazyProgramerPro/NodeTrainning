@@ -494,6 +494,30 @@ DELETE FROM cities WHERE country = 'Vietnam';
     - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `INTERSECT` -> `SELECT`
     - Trả về các dòng dữ liệu chung từ cả 2 bảng
 ## Subqueries
+- Subqueries:
+  - Subquery là một câu truy vấn lồng trong một câu truy vấn khác.
+  - Subquery giúp chúng ta thực hiện các câu truy vấn phức tạp hơn.
+  - Subquery có thể được sử dụng trong câu lệnh `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
+  - Subquery có thể trả về một giá trị hoặc một tập hợp các giá trị.
+  - Subquery có thể được sử dụng với các toán tử như `=`, `>`, `<`, `IN`, `NOT IN`, `EXISTS`, `NOT EXISTS`, ...
+- Subquery in SELECT:
+  - Subquery có thể trả về một giá trị hoặc một tập hợp các giá trị.
+  - Subquery có thể được sử dụng với các toán tử như `=`, `>`, `<`, `IN`, `NOT IN`, `EXISTS`, `NOT EXISTS`, ...
+  - VD: Lấy ra số lượng comment của mỗi bức ảnh:
+  ```sql
+  SELECT
+    id,
+    (SELECT COUNT(*) FROM comments WHERE photo_id = photos.id) as num_comments
+  FROM
+    photos;
+  ```
+  - Alalyzing SELECT statement:
+    - `SELECT`: Lấy dữ liệu từ bảng( Keyword)
+    - `id`: Lấy cột `id`
+    - `(SELECT COUNT(*) FROM comments WHERE photo_id = photos.id) as num_comments`: Subquery trả về số lượng comment của mỗi bức ảnh
+    - `FROM`: Tên của bảng
+    - `photos`: Tên của bảng
+    - Thứ tự thực hiện: `FROM` -> `WHERE` -> `GROUP BY` -> `HAVING` -> `ORDER BY` -> `OFFSET` -> `LIMIT` -> `SELECT`
 
 ## ACID Properties
 - ACID Properties:
@@ -577,16 +601,361 @@ DELETE FROM cities WHERE country = 'Vietnam';
 - Durability:
   - Durability đảm bảo rằng dữ liệu đã được lưu trữ phải được bảo vệ khỏi sự mất mát.
 ## Database Internals
-- Table là 1 cấu trúc dữ liệu chứa dữ liệu, mỗi table chứa nhiều dòng và mỗi dòng chứa nhiều cột.
-- RowID: Là 1 cột ẩn mà mỗi dòng trong table có 1 giá trị duy nhất.
-- Page: Là 1 phần của table, mỗi page chứa nhiều dòng.
 ## Database Indexes
+- Index là gì ?
+- Hiểu SQL query plan và Optimizer với Explain
+- IndexScan, SeqScan, Bitmap Index Scan, Index Only Scan, Index Only Bitmap Index Scan
+- B-Tree Index, Hash Index, Giảm độ phức tạp của câu lệnh SELECT, INSERT, UPDATE, DELETE
+- So sánh hiệu suất giữa Index và không Index
+- Khi nào nên sử dụng Index, quyết định Index cho cột nào, Index cho cột nào, Index cho cột nào
+
 ## Database Normalization
 ## Database Denormalization
 ## Database Sharding
+- Sharding là gì ? Là 1 quá trình phân đoạn dữ liệu thành các phân vùng trải rộng trên nhiều phiên bản CSVDL, mục đích là tăng hiệu suất và khả năng mở rộng của hệ thống.
+- Khi chúng ta có nhiều dữ liệu và chúng đều tập chung vào 1 máy chủ duy nhất thì máy chủ đó sẽ trở nên quá tải và không thể xử lý được nhiều request cùng 1 lúc. Thậm chí khi chúng ta có đánh chỉ mục cũng ko tối ưu đc.
+- Bạn có thể cần nhiều bộ nhớ và CPU để xử lý nhiều request cùng 1 lúc.
+Database Sharding là kỹ thuật phân chia cơ sở dữ liệu lớn thành các phần nhỏ hơn gọi là shard. Mỗi shard chứa một tập hợp dữ liệu riêng biệt và hoạt động độc lập. Việc này giúp cơ sở dữ liệu dễ dàng mở rộng, tăng cường hiệu năng và khả năng chịu lỗi bằng cách phân tán dữ liệu lên nhiều máy chủ.
+
+Consistent Hashing
+Consistent Hashing (băm nhất quán) là một kỹ thuật băm giúp xác định shard nào sẽ lưu trữ một dữ liệu cụ thể. Phương pháp này giúp giảm thiểu việc di chuyển dữ liệu khi thêm hoặc xóa shard mới, hạn chế ảnh hưởng đến việc phân bổ dữ liệu hiện có.
+
+Cách hoạt động: Dữ liệu được băm vào một không gian định danh (thường là một vòng tròn), và mỗi shard được gán một phạm vi hash cụ thể. Khi dữ liệu mới được thêm vào, nó sẽ được lưu trữ trên shard chịu trách nhiệm cho hash của nó. Nếu một shard mới được thêm, chỉ một phần dữ liệu cần di chuyển.
+Horizontal Partitioning vs Sharding
+Horizontal Partitioning (phân vùng ngang): Chia dữ liệu thành các phân vùng (theo hàng), có thể nằm trên cùng một máy chủ hoặc khác nhau. Thường được sử dụng để quản lý các bảng lớn bằng cách chia chúng theo các khoảng giá trị (ví dụ: ID khách hàng).
+
+Sharding: Là một hình thức phân vùng ngang nhưng độc lập hơn giữa các phân vùng (shard). Thông thường, dữ liệu được phân tán qua nhiều cơ sở dữ liệu hoặc máy chủ và mỗi shard có thể hoạt động như một cơ sở dữ liệu độc lập, cho phép khả năng mở rộng riêng.
+
+Ví dụ với PostgreSQL
+Dưới đây là một ví dụ đơn giản về cách triển khai sharding trong PostgreSQL.
+
+Định nghĩa Shard: Giả sử bạn có hai shard (shard_1 và shard_2) trên các cơ sở dữ liệu hoặc bảng khác nhau.
+
+Chèn dữ liệu dựa trên khóa shard: Có thể chọn một khóa sharding, ví dụ như user_id, và sử dụng logic modulo để phân chia.
+
+```sql
+Copy code
+-- Kết nối với cơ sở dữ liệu shard dựa trên logic sharding
+CREATE TABLE shard_1.user_data (id SERIAL PRIMARY KEY, user_id INT, data TEXT);
+CREATE TABLE shard_2.user_data (id SERIAL PRIMARY KEY, user_id INT, data TEXT);
+
+-- Chèn dữ liệu dựa trên khóa shard
+CREATE OR REPLACE FUNCTION insert_user_data(user_id INT, data TEXT) RETURNS VOID AS $$
+BEGIN
+    IF user_id % 2 = 0 THEN
+        INSERT INTO shard_1.user_data (user_id, data) VALUES (user_id, data);
+    ELSE
+        INSERT INTO shard_2.user_data (user_id, data) VALUES (user_id, data);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Ví dụ sử dụng
+SELECT insert_user_data(3, 'Dữ liệu mẫu cho người dùng 3');
+Ở đây, người dùng có ID chẵn sẽ được lưu ở shard_1, còn người dùng có ID lẻ sẽ được lưu ở shard_2.
+```
+Ưu và nhược điểm của Sharding
+Ưu điểm
+Scalability (Khả năng mở rộng): Tăng khả năng mở rộng theo chiều ngang, cho phép thêm shard mới khi dữ liệu tăng.
+Performance (Hiệu suất): Giảm tải trên từng máy chủ riêng lẻ, cải thiện thời gian phản hồi.
+Fault Tolerance (Khả năng chịu lỗi): Nếu một shard gặp sự cố, các shard khác không bị ảnh hưởng.
+Nhược điểm
+Complexity (Phức tạp): Sharding làm tăng độ phức tạp trong logic ứng dụng và hạ tầng.
+Maintenance (Bảo trì): Quản lý shard, cân bằng dữ liệu, và phục hồi sau lỗi có thể cần nhiều công sức.
+Cross-shard Joins (Liên kết chéo giữa các shard): Các truy vấn liên quan đến nhiều shard trở nên phức tạp và kém hiệu quả hơn.
+- What is sharding?
+-  Consistent Hashing
+-  Horizontal Partitioning vs Sharding
+-  Example (Code with Postgres)
+-  Pros & Cons
+-  Summary
 ## Concurency Control
+- Exclusive Lock (Khóa độc quyền)
+  - Exclusive Lock là khóa cho phép một giao dịch duy nhất có quyền truy cập và thay đổi dữ liệu tại một thời điểm. Khi một giao dịch đã nắm giữ exclusive lock trên một phần dữ liệu, không giao dịch nào khác có thể đọc hoặc ghi vào phần dữ liệu đó cho đến khi khóa được giải phóng.
+  - Sử dụng: Exclusive lock thường được sử dụng cho các thao tác ghi (INSERT, UPDATE, DELETE) để đảm bảo rằng không có giao dịch nào khác có thể đọc hoặc ghi dữ liệu trong khi thao tác ghi đang diễn ra.
+  - Ưu điểm: Đảm bảo tính toàn vẹn và nhất quán của dữ liệu khi thực hiện các thao tác ghi.
+  - Hạn chế: Có thể gây chậm trễ hoặc tắc nghẽn khi nhiều giao dịch cần truy cập vào cùng một dữ liệu.
+  Ví dụ 1: Exclusive Lock
+Giả sử có một bảng account_balance lưu số dư tài khoản của khách hàng:
+
+```sql
+Copy code
+CREATE TABLE account_balance (
+    account_id INT PRIMARY KEY,
+    balance DECIMAL(10, 2)
+);
+```
+- Tình huống sử dụng Exclusive Lock:
+  - Giả sử giao dịch A cần cập nhật số dư tài khoản của khách hàng. Để thực hiện việc này, nó cần khóa hàng (row) tương ứng để không có giao dịch nào khác có thể đọc hoặc ghi trong khi thao tác đang diễn ra.
+```sql
+Copy code
+-- Giao dịch A bắt đầu
+BEGIN;
+
+-- Giao dịch A lấy exclusive lock để cập nhật số dư
+UPDATE account_balance
+SET balance = balance - 100
+WHERE account_id = 1;
+-- Exclusive lock được giữ cho đến khi giao dịch kết thúc
+
+-- Giao dịch A hoàn thành
+COMMIT;
+```
+Trong thời gian giao dịch A giữ exclusive lock, nếu một giao dịch khác (giao dịch B) cố gắng đọc hoặc ghi vào account_balance cho account_id = 1, giao dịch B sẽ phải đợi cho đến khi giao dịch A hoàn tất và giải phóng khóa.
+- Shared Lock (Khóa chia sẻ)
+  - Shared Lock là khóa cho phép nhiều giao dịch đồng thời đọc cùng một phần dữ liệu mà không cần thay đổi trạng thái của dữ liệu. Khi một giao dịch nắm giữ shared lock, các giao dịch khác cũng có thể nắm giữ shared lock trên cùng phần dữ liệu để đọc.
+  - Sử dụng: Shared lock thường được dùng cho các thao tác đọc (SELECT) khi không cần thay đổi dữ liệu.
+  - Ưu điểm: Cho phép nhiều giao dịch đọc dữ liệu cùng lúc, tăng hiệu suất đọc mà không cần phải đợi lẫn nhau.
+  - Hạn chế: Nếu có một giao dịch yêu cầu exclusive lock (để ghi), nó sẽ phải đợi cho đến khi tất cả các shared lock trên phần dữ liệu đó được giải phóng.
+  Giả sử bạn có một bảng products lưu thông tin về sản phẩm:
+
+```sql
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    price DECIMAL(10, 2)
+);
+```
+- Tình huống sử dụng Shared Lock:
+  - Giả sử giao dịch C muốn kiểm tra giá của một sản phẩm. Nó sẽ cần shared lock để có thể đọc dữ liệu mà không bị xung đột với các giao dịch đọc khác.
+
+```sql
+-- Giao dịch C bắt đầu
+BEGIN;
+
+-- Giao dịch C lấy shared lock để đọc giá sản phẩm
+SELECT price FROM products WHERE product_id = 1;
+
+-- Giao dịch C hoàn thành
+COMMIT;
+```
+  - Vì đây là shared lock, nên nhiều giao dịch khác (như giao dịch D, E, ...) cũng có thể lấy shared lock trên cùng dữ liệu đó để đọc thông tin sản phẩm. Tuy nhiên, nếu có một giao dịch khác muốn thực hiện thao tác ghi (cần exclusive lock), nó sẽ phải đợi cho đến khi tất cả các shared lock được giải phóng.
+So sánh nhanh giữa Exclusive Lock và Shared Lock
+Thuộc tính	Exclusive Lock	Shared Lock
+Chỉ dành cho	Một giao dịch duy nhất	Nhiều giao dịch đồng thời
+Phù hợp cho	Ghi (INSERT, UPDATE, DELETE)	Đọc (SELECT)
+Khả năng truy cập	Chặn mọi giao dịch khác	Cho phép nhiều giao dịch đọc
+Xung đột với	Shared Lock, Exclusive Lock	Exclusive Lock
+- Tóm tắt
+  - Exclusive Lock: Được sử dụng cho thao tác ghi, chỉ cho phép một giao dịch truy cập dữ liệu tại một thời điểm.
+  - Shared Lock: Được sử dụng cho thao tác đọc, cho phép nhiều giao dịch đọc cùng một dữ liệu mà không cần đợi.
+- Deadlock xảy ra khi hai hoặc nhiều giao dịch (transactions) chờ nhau giải phóng tài nguyên để tiếp tục thực hiện, dẫn đến tình trạng không giao dịch nào có thể hoàn tất được. Trong cơ sở dữ liệu, deadlock thường xảy ra khi hai giao dịch cố gắng giữ các khóa trên các tài nguyên khác nhau mà cả hai đều cần để thực hiện, và mỗi giao dịch chờ tài nguyên từ giao dịch kia, tạo thành vòng lặp chờ vô hạn.
+- Ví dụ về Deadlock
+  - Giả sử bạn có một bảng accounts trong cơ sở dữ liệu để quản lý số dư tài khoản:
+```sql
+Copy code
+CREATE TABLE accounts (
+    account_id INT PRIMARY KEY,
+    balance DECIMAL(10, 2)
+);
+```
+- Tình huống xảy ra Deadlock:
+  - Giả sử có hai giao dịch A và B thực hiện thao tác cập nhật trên các tài khoản khác nhau nhưng cuối cùng lại cần quyền truy cập vào cùng một tài khoản:
+  - Giao dịch A muốn chuyển tiền từ tài khoản account_id = 1 sang account_id = 2.
+  - Giao dịch B muốn chuyển tiền từ tài khoản account_id = 2 sang account_id = 1.
+- Quá trình thực hiện giao dịch:
+  - Giao dịch A bắt đầu và lấy exclusive lock trên account_id = 1 để trừ tiền từ tài khoản này:
+```sql
+-- Giao dịch A bắt đầu
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;
+```
+  - Giao dịch B bắt đầu và lấy exclusive lock trên account_id = 2 để trừ tiền từ tài khoản này:
+```sql
+-- Giao dịch B bắt đầu
+BEGIN;
+UPDATE accounts SET balance = balance - 50 WHERE account_id = 2;
+```
+  - Giao dịch A tiếp tục và cố gắng lấy exclusive lock trên account_id = 2 để cộng tiền vào tài khoản đó, nhưng không thể vì tài khoản này đã bị khóa bởi Giao dịch B.
+  - Giao dịch B tiếp tục và cố gắng lấy exclusive lock trên account_id = 1 để cộng tiền vào tài khoản đó, nhưng không thể vì tài khoản này đã bị khóa bởi Giao dịch A.
+  - Vậy, Giao dịch A chờ Giao dịch B giải phóng khóa trên account_id = 2, và Giao dịch B chờ Giao dịch A giải phóng khóa trên account_id = 1. Không giao dịch nào có thể hoàn tất, và tình trạng deadlock xảy ra.
+- Cách phòng tránh Deadlock
+  - Đặt thứ tự truy cập tài nguyên: Đảm bảo rằng tất cả các giao dịch truy cập tài nguyên theo một thứ tự nhất định để tránh vòng lặp chờ. Ví dụ, luôn truy cập account_id nhỏ trước rồi đến account_id lớn.
+  - Thiết lập timeout cho giao dịch: Nhiều hệ quản trị cơ sở dữ liệu (DBMS) hỗ trợ thiết lập thời gian chờ cho các khóa. Nếu giao dịch không thể lấy khóa trong một khoảng thời gian nhất định, nó sẽ bị hủy, giúp ngăn chặn deadlock.
+  - Phát hiện và phá vỡ deadlock: Nhiều DBMS có cơ chế phát hiện deadlock tự động. Khi phát hiện deadlock, một trong các giao dịch sẽ bị hủy để giải phóng tài nguyên và cho phép các giao dịch khác tiếp tục.
+  - Tối ưu hóa logic giao dịch: Viết các giao dịch với thời gian giữ khóa ngắn nhất có thể để giảm thiểu khả năng xảy ra deadlock. Tránh thao tác với nhiều tài nguyên khác nhau trong một giao dịch khi không cần thiết.
+- Tóm tắt
+  - Deadlock là một tình huống bế tắc khi các giao dịch chờ lẫn nhau để giải phóng tài nguyên, dẫn đến vòng lặp chờ không thể giải quyết. Phòng tránh deadlock yêu cầu quản lý và tối ưu hóa cách các giao dịch truy cập tài nguyên, sử dụng timeout hoặc phát hiện và phá vỡ deadlock tự động trong hệ quản trị cơ sở dữ liệu.
+
+- Lí do sử dụng offset khiến câu truy vấn trở nên chậm
+  - Quét qua tất cả các bản ghi trước OFFSET: Khi sử dụng OFFSET, cơ sở dữ liệu phải duyệt qua toàn bộ các bản ghi từ đầu đến vị trí bắt đầu của OFFSET để loại bỏ chúng trước khi lấy các bản ghi cần thiết. Điều này làm tăng chi phí xử lý, đặc biệt với các tập dữ liệu lớn. Ví dụ, nếu bạn có OFFSET 10000 LIMIT 10, cơ sở dữ liệu phải đọc 10,000 bản ghi đầu tiên rồi mới chọn 10 bản ghi tiếp theo.
+```sql
+SELECT * FROM orders
+ORDER BY created_at
+OFFSET 10000 LIMIT 10;
+
+```
+  -  Không sử dụng được chỉ mục hiệu quả: Khi sử dụng OFFSET, chỉ mục không được tận dụng triệt để vì cơ sở dữ liệu cần duyệt qua và loại bỏ các bản ghi dựa trên thứ tự yêu cầu. Đối với các trường hợp sắp xếp phức tạp, chỉ mục cũng khó hỗ trợ tốt, dẫn đến quá trình tìm kiếm và bỏ qua bản ghi chậm hơn.
+  - Tăng chi phí xử lý bộ nhớ và CPU:Khi số lượng bản ghi bị bỏ qua tăng lên, việc duyệt qua từng bản ghi và lưu trữ trong bộ nhớ tạm trước khi loại bỏ chúng sẽ làm tăng tải lên bộ nhớ và CPU. Điều này dẫn đến thời gian xử lý lâu hơn, ảnh hưởng đến hiệu suất hệ thống.
+  - Thiếu khả năng tối ưu hóa truy vấn: Một số hệ quản trị cơ sở dữ liệu gặp khó khăn trong việc tối ưu hóa các truy vấn sử dụng OFFSET, vì phần lớn công việc nằm ở việc quét và bỏ qua dữ liệu. Điều này làm tăng độ phức tạp, và DBMS khó tối ưu hóa hơn so với truy vấn không sử dụng OFFSET.
+![alt text](image-184.png)
+
+## Database Connection Pooling
+- Database Connection Pooling (bộ kết nối cơ sở dữ liệu) là một kỹ thuật quản lý các kết nối đến cơ sở dữ liệu trong một ứng dụng. Thay vì tạo một kết nối mới mỗi khi cần truy cập vào cơ sở dữ liệu, Connection Pooling tạo ra một nhóm các kết nối có sẵn và quản lý chúng. Các kết nối này được tái sử dụng cho nhiều yêu cầu từ ứng dụng, giúp giảm thời gian tạo kết nối mới và cải thiện hiệu suất hệ thống.
+- Cách hoạt động của Database Connection Pooling:
+  - Khởi tạo Pool: Khi ứng dụng khởi động, một số lượng kết nối cố định (hoặc có thể cấu hình) sẽ được tạo ra và lưu trữ trong "pool" (bể kết nối).
+  - Yêu cầu kết nối: Khi ứng dụng cần thực hiện truy vấn, nó sẽ lấy một kết nối có sẵn từ pool thay vì tạo một kết nối mới.
+  - Hoàn trả kết nối: Sau khi truy vấn hoàn tất, kết nối được trả lại vào pool để sẵn sàng phục vụ yêu cầu tiếp theo.
+  - Mở rộng hoặc thu nhỏ pool: Một số connection pool có khả năng mở rộng khi số lượng yêu cầu cao (tạo thêm kết nối) và thu nhỏ khi nhu cầu giảm xuống (đóng bớt kết nối không cần thiết).
+- Ưu điểm của Database Connection Pooling:
+  - Hiệu suất tốt hơn: Giảm thời gian cần thiết để kết nối với cơ sở dữ liệu, vì các kết nối đã được tạo sẵn và chỉ cần tái sử dụng.
+  - Giảm tải cho cơ sở dữ liệu: Giới hạn số lượng kết nối tối đa mà ứng dụng có thể mở đến cơ sở dữ liệu, giúp tránh tình trạng quá tải.
+  - Quản lý tài nguyên hiệu quả: Tối ưu hóa việc sử dụng tài nguyên và quản lý kết nối, đặc biệt quan trọng khi có nhiều yêu cầu đồng thời.
+  - Dễ dàng mở rộng: Giúp ứng dụng đáp ứng tốt hơn khi nhu cầu truy cập cơ sở dữ liệu tăng lên, bằng cách cấu hình để tạo thêm các kết nối khi cần thiết.
+- Nhược điểm của Database Connection Pooling:
+  - Quản lý phức tạp: Cần cấu hình số lượng kết nối tối đa, thời gian chờ, và các thông số khác để đảm bảo hoạt động tối ưu.
+  - Tiêu thụ bộ nhớ: Mỗi kết nối vẫn sử dụng bộ nhớ và tài nguyên hệ thống, vì vậy nếu quá nhiều kết nối được tạo ra, có thể gây tiêu thụ bộ nhớ cao.
+  - Kết nối cũ bị mất: Trong một số trường hợp, các kết nối cũ có thể bị hỏng (do thời gian chờ quá lâu hoặc lỗi mạng), cần phải được phát hiện và loại bỏ khỏi pool.
+```js
+const { Pool } = require('pg');
+
+// Khởi tạo pool với các thông số cấu hình
+const pool = new Pool({
+  user: 'dbuser',
+  host: 'localhost',
+  database: 'mydb',
+  password: 'secretpassword',
+  port: 5432,
+  max: 10,               // Số kết nối tối đa trong pool
+  idleTimeoutMillis: 30000, // Thời gian chờ trước khi đóng kết nối nhàn rỗi
+  connectionTimeoutMillis: 2000 // Thời gian chờ khi yêu cầu kết nối
+});
+
+// Sử dụng kết nối từ pool để thực hiện truy vấn
+async function queryDatabase() {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT * FROM mytable');
+    console.log(res.rows);
+  } finally {
+    client.release(); // Trả kết nối lại vào pool sau khi dùng xong
+  }
+}
+
+// Gọi hàm thực hiện truy vấn
+queryDatabase().catch(err => console.error('Error executing query', err));
+
+```
 ## Database Replication
+- Replication database (sao chép cơ sở dữ liệu) là một kỹ thuật tạo ra các bản sao của cơ sở dữ liệu để lưu trữ trên nhiều máy chủ khác nhau. Kỹ thuật này đảm bảo dữ liệu có sẵn và đáng tin cậy hơn bằng cách nhân bản dữ liệu từ một cơ sở dữ liệu chính (primary database) đến các cơ sở dữ liệu phụ (replica database). Các bản sao này có thể được sử dụng cho mục đích đọc, xử lý yêu cầu phân tán, và cải thiện hiệu suất hệ thống.
+
+- Các kiểu Replication Database phổ biến
+  - Master-Slave Replication:
+    - Master Database: Chịu trách nhiệm ghi dữ liệu và thực hiện các thay đổi.
+    - Slave Database: Nhận dữ liệu từ master và chỉ phục vụ cho việc đọc (read-only).
+    - Ứng dụng: Thường được dùng để giảm tải cho master bằng cách chuyển các truy vấn đọc sang slave.
+  - Master-Master Replication:
+    - Mỗi cơ sở dữ liệu có thể vừa ghi vừa đọc dữ liệu, cho phép nhiều nguồn ghi đồng thời.
+    - Thích hợp cho các hệ thống yêu cầu truy cập đồng thời từ nhiều máy chủ.
+    - Khó khăn: Xử lý xung đột dữ liệu khi có nhiều bản ghi đồng thời, yêu cầu cơ chế đồng bộ hóa tốt.
+    Transactional Replication:
+
+Thường sao chép các thay đổi ở mức độ giao dịch, đảm bảo tính toàn vẹn của dữ liệu.
+Ứng dụng: Phù hợp cho các hệ thống cần độ chính xác cao trong việc sao chép dữ liệu (như hệ thống tài chính).
+Snapshot Replication:
+
+Tạo bản sao của cơ sở dữ liệu tại một thời điểm nhất định và sao chép toàn bộ dữ liệu.
+Ưu điểm: Dễ triển khai, thích hợp cho các hệ thống ít cập nhật dữ liệu.
+Nhược điểm: Không phù hợp với hệ thống yêu cầu thời gian thực vì dữ liệu chỉ được cập nhật định kỳ.
+Log-based Replication:
+
+Sử dụng các thay đổi được ghi nhận trong transaction log để cập nhật dữ liệu từ bản chính sang các bản sao.
+Ứng dụng: Hiệu quả cho các hệ thống yêu cầu cập nhật nhanh và liên tục.
+Ưu điểm của Replication Database
+Cải thiện hiệu suất: Chuyển các truy vấn đọc sang các replica để giảm tải cho cơ sở dữ liệu chính.
+Tăng khả năng chịu lỗi: Trong trường hợp hệ thống chính gặp sự cố, các bản sao có thể thay thế, đảm bảo dịch vụ liên tục.
+Khả năng mở rộng: Dễ dàng mở rộng hệ thống khi lưu lượng truy cập tăng bằng cách thêm nhiều bản sao.
+Cải thiện tốc độ truy cập: Đặt các replica ở các vị trí địa lý khác nhau, giúp giảm độ trễ truy cập từ các khu vực khác nhau.
+Nhược điểm của Replication Database
+Độ trễ đồng bộ: Các replica có thể không kịp thời cập nhật các thay đổi từ cơ sở dữ liệu chính, dẫn đến sự sai lệch về dữ liệu (độ trễ replication).
+Quản lý phức tạp: Cần theo dõi và duy trì sự nhất quán giữa các bản sao, đặc biệt trong trường hợp có nhiều replica hoặc replication đa chiều.
+Chi phí tài nguyên cao: Việc nhân bản dữ liệu đòi hỏi thêm không gian lưu trữ và tài nguyên hệ thống.
+Xử lý xung đột dữ liệu: Với các hệ thống có nhiều nguồn ghi (master-master replication), dễ xảy ra xung đột dữ liệu, yêu cầu cơ chế phát hiện và giải quyết xung đột hiệu quả.
+Ví dụ về Replication trong MySQL (Master-Slave)
+Cấu hình Master:
+
+Chỉnh sửa file cấu hình MySQL (my.cnf) để đặt server thành master.
+
+Ví dụ cấu hình:
+
+ini
+Copy code
+[mysqld]
+server-id = 1
+log-bin = /var/log/mysql/mysql-bin.log
+Tạo user cho Replication:
+
+sql
+Copy code
+CREATE USER 'replicator'@'%' IDENTIFIED BY 'password';
+GRANT REPLICATION SLAVE ON *.* TO 'replicator'@'%';
+Cấu hình Slave:
+
+Chỉnh sửa my.cnf trên server slave để cấu hình thành replica.
+
+ini
+Copy code
+[mysqld]
+server-id = 2
+Bắt đầu Replication:
+
+sql
+Copy code
+CHANGE MASTER TO
+  MASTER_HOST='master_host',
+  MASTER_USER='replicator',
+  MASTER_PASSWORD='password',
+  MASTER_LOG_FILE='mysql-bin.000001',
+  MASTER_LOG_POS= 0;
+
+START SLAVE;
+Tóm tắt
+Database replication là kỹ thuật tạo bản sao cơ sở dữ liệu giúp cải thiện hiệu suất, tăng khả năng chịu lỗi, và hỗ trợ mở rộng hệ thống. Có nhiều kiểu replication phù hợp cho từng nhu cầu, nhưng triển khai và duy trì replication yêu cầu quản lý phức tạp và tốn tài nguyên.
 ## Database Partitioning
+- Là một kỹ thuật chia nhỏ cơ sở dữ liệu thành nhiều phần nhỏ hơn để tăng hiệu suất và sự linh hoạt.
+- Và để CSDL quyết định bảng nào hoặc phân vùng nào sẽ được truy cập dựa trên mệnh đề WHERE
+- Giả sử chúng ta có 1 bảng có 1 triệu dòng dữ liệu, nếu chúng ta chia nhỏ thành 10 phân vùng thì mỗi phân vùng sẽ có 100.000 dòng dữ liệu.
+- Khi chúng ta truy vấn dữ liệu từ bảng, CSDL sẽ quyết định bảng nào hoặc phân vùng nào sẽ được truy cập dựa trên mệnh đề WHERE.
+![alt text](image-182.png)
+- Những gì CSDL sẽ làm là nếu bạn có 1 chỉ mục trên bảng chúng ta sẽ sử dụng chỉ mục đó và sau đó chúng ta sẽ đến hàng cụ thể trên ổ đĩa và lấy dữ liệu từ đó.Hoặc nếu không có chúng ta sẽ dùng Table Scan để quét toàn bộ bảng=> Với những bảng nhiều dữ liệu thì đây là điều tồi tệ nhất mà chúng ta có thể làm
+- Phân vùng dữ liệu  ý tưởng ở đây là chia bảng thành nhiều thành phần nhỏ hơn để chúng ta biết rằng chúng ta chỉ làm việc với một phần nhỏ của bảng đó.
+- Cơ sở dữ liệu này sẽ gắn các phân vùng này vào bảng chính
+![alt text](image-183.png)
+- Horizontal Partitioning:
+  - Chia bảng thành nhiều phân vùng dựa trên hàng ( CHia thành các phần từ ID này đến ID kia)
+  - VD: Chia bảng `users` thành 2 phân vùng dựa trên cột `id`
+- Vertical Partitioning:
+  - Chia bảng thành nhiều phân vùng dựa trên cột( Chia thành các cột nào hay được truy cập cùng nhau hoặc những cột nào không cần thiết như password, blob data)
+  - VD: Chia bảng `users` thành 2 phân vùng dựa trên cột `username`
+
+- Partitioning Types:
+  - Range Partitioning: Chia bảng thành nhiều phân vùng dựa trên giá trị của cột (Date, IDs,...)
+  - List Partitioning: Chia bảng thành nhiều phân vùng dựa trên giá trị của cột(Data cho Hà Nội, Hồ Chí Minh, Đà Nẵng)
+  - Hash Partitioning: Chia bảng thành nhiều phân vùng dựa trên giá trị của hàm băm
+  - Composite Partitioning: Kết hợp nhiều phân vùng
+  - Subpartitioning: Chia phân vùng thành nhiều phân vùng nhỏ hơn
+- So sánh Horizontal Parttioning với Sharing:
+  - HP chia bảng lớn thành nhiều bảng trong cùng CSDL và CSDL đảm nhận việc quản lí các phân vùng này
+  - Sharing chia bảng lớn thành nhiều bảng tuy nhiên chúng là các máy chủ hoàn toàn khác nhau(Ví dụ bạn có những khách hàng ở châu Á và châu Âu, bạn có thể chia dữ liệu của họ ra 2 máy chủ khác nhau)
+- Lợi ích của Partitioning:
+  - Tăng hiệu suất: Chúng ta chỉ làm việc với một phần nhỏ của bảng
+  - Tăng sự linh hoạt: Chúng ta có thể dễ dàng thêm hoặc xóa phân vùng
+  - Tăng khả năng chịu lỗi: Nếu một phân vùng bị lỗi, các phân vùng khác vẫn hoạt động bình thường
+  - Tăng khả năng mở rộng: Chúng ta có thể dễ dàng mở rộng cơ sở dữ liệu bằng cách thêm phân vùng mới
+  - Chi phí thấp: Chúng ta không cần phải mua nhiều máy chủ
+- Nhược điểm của Partitioning:
+  - Khó quản lí: Chúng ta cần quản lí nhiều phân vùng
+  - Khó hiểu: Chúng ta cần hiểu rõ cách hoạt động của phân vùng
+  - Khó triển khai: Chúng ta cần phải cấu hình phân vùng
+  - Khó bảo trì: Chúng ta cần phải bảo trì nhiều phân vùng
+  - Update: Cập nhật dữ liệu trên phân vùng có thể mất nhiều thời gian
+  - Khi thay đổi cấu trúc bảng, chúng ta cần phải thay đổi cấu trúc của tất cả các phân vùng
+Summary:
+- Partitioning là gì ?
+- Horizontal Partitioning và Vertical Partitioning
+- Partitioning Types: Range, List, Hash, Composite, Subpartitioning
+- Lợi ích và nhược điểm của Partitioning
+
 ## Database Backup and Recovery
 ## Database Security
 ## Database Performance Tuning

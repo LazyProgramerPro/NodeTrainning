@@ -476,13 +476,29 @@ DOM API
 ![alt text](image-126.png)
 
 ## REDUX
+-   Redux là 1 thư viện javascript giúp quản lý/cập nhật "application state" (tương tự như react state, app state chính là tất cả data muốn lưu trữ cho ứng dụng)
+-  Redux cung cấp pattern (quy luật/luật lệ) để code, thông qua sử dụng "events" (gọi là actions)=> mô hình pub/sub (publisher/subscribers)
+-  Redux giúp chúng ta quản lý state của ứng dụng một cách dễ dàng và hiệu quả
+![alt text](image-181.png)
+- Code của redux có thể predictable/testable
+- Không phải tất cả ứng dụng dùng React, là "phải dùng Redux". Redux có hữu ích nhiều 
+nhất khi: 
+    - Có 1 lượng lớn data của "application state", cần được chia sẻ (sử dụng) tại nhiều nơi trong ứng dụng (dùng tại nhiều component)
+    - App state được "update" thường xuyên - Logic để update "app state" dài dòng, phức tạp (nhiều code :v)
+    - App có kích thước vừa và lớn (có khối lượng code lớn), và team có nhiều người.
+- React Context API là tính năng tích hợp sẵn của React, cung cấp phương thức "trông giống như Redux" (useReducer), có nhiệm vụ passing (down) props từ cha xuống con, giúp chúng ta tránh việc "props drilling" (truyền props từ cha xuống con qua nhiều cấp)
+- Redux và Context API phục vụ các mục đích khác nhau: 
+    - Nếu bạn cần truyền props từ cha xuống con (mà không muốn viết quá nhiều code) => sử dụng Context api.Context api giống như "thùng chứa data". bạn cần, bạn lấy ra dùng. 
+- Bạn dùng Redux khi: 
+    - Cần tính năng như context api (thùng chứa data)
+    - Muốn hiểu tại sao "state" update, nơi nào xảy ra (why/where/how)
+    - Muốn có pattern để viết code (phong cách viết code). Code có thể testing được (kiểm thử)
 ### Toolkit
 ### Saga
 ### Thunk
 ### RTK Query
 
 ## React Query
-##
 ## Design Patterns, Best Practices, and Performance
 ### Screen Spliter
 ### List
