@@ -45,6 +45,28 @@
 - Edge server: Máy chủ ở các PoP, giúp chúng ta phân phối nội dung đến người dùng một cách nhanh chóng và hiệu quả, chúng đóng 1 vai trò rất quan trọng trong modern HTTP Stack.
 - CDN có tính bảo mật cao, giúp chúng ta bảo vệ trang web khỏi các cuộc tấn công như DDoS, SQL Injection, XSS, CSRF, và nhiều cuộc tấn công khác. Chúng sẽ giúp chúng ta chuyển hướng các cuộc tấn công đến máy chủ CDN thay vì máy chủ chính của chúng ta.
 - CDN cũng giúp chúng ta cải thiện tính khả dụng.Về cơ bản CDN có tính phân tán cao và có thể chịu được nhiều lỗi phần cứng hơn so với máy chủ chính của chúng ta. Nếu một máy chủ CDN bị lỗi, chúng ta có thể chuyển yêu cầu đến máy chủ CDN khác.
+![alt text](image-188.png)
+1. Bob nhập www.myshop.com vào trình duyệt. Trình duyệt tra cứu tên miền trong bộ đệm DNS cục bộ.
+
+2. Nếu tên miền không tồn tại trong bộ đệm DNS cục bộ, trình duyệt sẽ chuyển đến trình phân giải DNS để phân giải tên. Trình phân giải DNS thường nằm trong Nhà cung cấp dịch vụ Internet (ISP).
+
+3. Trình phân giải DNS phân giải tên miền theo cách đệ quy (xem bài đăng trước của tôi để biết chi tiết). Cuối cùng, nó yêu cầu máy chủ tên có thẩm quyền phân giải tên miền. 
+
+4. Nếu chúng ta không sử dụng CDN, máy chủ tên có thẩm quyền sẽ trả về địa chỉ IP cho www.myshop.com . Nhưng với CDN, máy chủ tên có thẩm quyền có một bí danh trỏ đến www.myshop.cdn.com (tên miền của máy chủ CDN).
+
+5. Trình phân giải DNS yêu cầu máy chủ tên có thẩm quyền phân giải www.myshop.cdn.com .
+
+6. Máy chủ tên có thẩm quyền trả về tên miền cho bộ cân bằng tải của CDN www.myshop.lb.com .
+
+7. Bộ giải quyết DNS yêu cầu bộ cân bằng tải CDN giải quyết www.myshop.lb.com . Bộ cân bằng tải chọn máy chủ biên CDN tối ưu dựa trên địa chỉ IP của người dùng, ISP của người dùng, nội dung được yêu cầu và tải máy chủ.
+
+8. Bộ cân bằng tải CDN trả về địa chỉ IP của máy chủ biên CDN cho www.myshop.lb.com .
+
+9. Bây giờ cuối cùng chúng ta cũng có được địa chỉ IP thực tế để truy cập. Bộ giải quyết DNS trả về địa chỉ IP cho trình duyệt.    
+
+10. Trình duyệt truy cập máy chủ biên CDN để tải nội dung. Có hai loại nội dung được lưu trong bộ nhớ đệm trên máy chủ CDN: nội dung tĩnh và nội dung động. Nội dung tĩnh chứa các trang tĩnh, hình ảnh, video; nội dung động bao gồm kết quả của điện toán biên.
+
+11. Nếu bộ nhớ đệm máy chủ CDN biên không chứa nội dung, nội dung đó sẽ được chuyển lên máy chủ CDN khu vực. Nếu vẫn không tìm thấy nội dung, nội dung đó sẽ được chuyển lên máy chủ CDN trung tâm hoặc thậm chí chuyển đến máy chủ gốc - máy chủ web London. Đây được gọi là mạng phân phối CDN, nơi các máy chủ được triển khai theo vị trí địa lý.
 
 # Caching
 - Bộ nhớ đệm là 1 kĩ thuật phổ biến nhằm nâng cao hiệu suất của hệ thống và giảm thời gian phản hồi. Bộ nhớ đệm giúp chúng ta lưu trữ dữ liệu tạm thời, giảm thời gian truy cập dữ liệu từ ổ cứng hoặc từ mạng, giảm tải cho máy chủ, giảm chi phí băng thông, và tăng khả năng chịu lỗi của hệ thống.
