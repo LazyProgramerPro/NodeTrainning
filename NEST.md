@@ -134,4 +134,6 @@
     await this.userRepository.remove(user);
   }
   ```
-  
+# QueryBuilder trong TypeORM
+
+# GRAphQL

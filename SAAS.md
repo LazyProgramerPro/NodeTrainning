@@ -157,7 +157,7 @@
 - Integration service: dịch vụ tích hợp
 
 # Multi-tenancy 
-- Multi-tenancy là một kiến trúc phần mềm cho phép nhiều tenants sử dụng cùng một ứng dụng, mỗi tenant có thể có nhiều người dùng và dữ liệu riêng biệt.
+- Multi-tenancy là một kiến trúc phần mềm cho     phép nhiều tenants sử dụng cùng một ứng dụng, mỗi tenant có thể có nhiều người dùng và dữ liệu riêng biệt.
 - Các ứng dụng SaaS thường triển khai theo mô hình multi-tenancy để giảm chi phí về cơ sở hạ tầng và tăng tính linh hoạt trong việc mở rộng hệ thống.
 - Tenant: người thuê, công ty, cá nhân,.., người dùng cuối cùng của ứng dụng SaaS.Về cơ bản là 1 thực thể nào đó đang sử dụng SaaS của chúng ta
 - Single-tenancy: mỗi tenant sử dụng một ứng dụng riêng biệt, mỗi ứng dụng có cơ sở dữ liệu riêng biệt, không chia sẻ dữ liệu với tenant khác. Trong trường hợp này bạn sẽ phải truy cập vào máy chủ Hardware và cài đặt ứng dụng cũng như cài đặt kho lưu trữ của b lên đó

@@ -228,13 +228,148 @@ VD: Xây dựng 1 diễn đàn thảo luận 1 vấn đề gì đó công khai (
     - Ngoài ra sẽ có 1 số hạn chế về ngôn ngữ, Cloud
 - Thiết kế API
     - Rest API
-        - Xác định các thực thể trong hệ thống của mình : user, post, image, comment, vote
+        - Xác định các thực thể trong hệ thống của mình :
+         user, post, image, comment, vote
         - Mapping các thực thể đó đến URL : image here
         - Xác định cách biểu diễn của từng tài nguyên (Model)
         - Gán các METHOD cho resource
     - Limit, paginate resource
     
 
-# Usecase
 
+# Microservices and Event-Driven Architecture
+## Microservices
+- Là phong cách kiến trúc hiện đại và phổ biến nhất trong ngành công nghiệp phần mềm hiện nay
+- Theo phong cách này toàn bộ hệ thống được tổ chức như 1 tập hợp cách dịch vụ độc lập
+- Được nhiều công ty lớn sử dụng như Amazon, Netflix, Uber, ...
+- Khi được thực hiện 1 cách chính xác:
+    - Kiến trúc MS cho phép các tổ chức mở rộng quy mô lên đến hàng nghìn hoặc trăm nghìn kĩ sư để chia thành các nhóm nhỏ để hoạt động độc lập
+    - Điều này cho phép các tổ chức xây dựng các hệ thống có khả năng mở rộng cao, tiếp cận hàng tỷ người dùng
+    - Duy trì chi phí thấp, giảm thiểu rủi ro và tăng cường khả năng mở rộng
+- MS rất thú vị, tuy nhiên nó không phải là viên đạn bạc giải quyết được tất cả các vấn đề. Khi áp dụng không đúng cách nó có thể gây ra nhiều chi phí không cần thiết và không thể giải quyết được vấn đề
 
+## Event-Driven Architecture
+- Thường được sử dụng cùng MS bằng cách thiết lập các giao tiếp dựa trên các sự kiện không đồng bộ
+
+## Những vấn đề của kiến trúc Monolithic
+- Monolithic là kiến trúc truyền thống, tất cả các thành phần của hệ thống được xây dựng trong 1 ứng dụng duy nhất Backend, Frontend, Database
+- Lợi ích:
+    - Dễ dàng thiết kế và phát triển
+        - Phù hợp với hầu hết mọi hệ thống Web: Tin tức, Blog, Ngân hàng, ...
+    - Dễ thực hiện với 1 nhóm nhỏ gồm các nhà phát triển Fullstack và 1 số web Framework và các CSDL tiêu chuẩn
+    - Nhanh chóng đưa sản phẩm đến tay người dùng phù hợp với các STARTUP và các team nhỏ
+- Vấn đề:
+    - Có quá nhiều kĩ sư làm việc trên cùng 1 codebase, conflict code trở thành 1 vấn đề nghiêm trọng
+    - Complex Codebase: Codebase trở nên phức tạp và khó bảo trì:
+        - Mỗi lần thay đổi phải test lại toàn bộ hệ thống
+        - Khó tìm lỗi
+        - Khó mở rộng
+        - Deploy mất nhiều thời gian hơn
+        - Khó tiếp cận với những kĩ sư mới
+    - Khả năng mở rộng kém: Mỗi version chứa toàn bộ logic nghiệp vụ của chúng ta, yêu cầu rất nhiều CPU và RAM => Cần những máy tính cao cấp và đắt tiền
+    - Hạn chế rẩ nhiều về công nghệ: Khó để chuyển đổi sang công nghệ mới, bạn nghĩ sao về việc sử dụng 1 công nghệ từ 10 năm trước? và không thể tận dụng được những công nghệ mới nhất
+    - Khó để scale: Khó để scale hệ thống lên hàng triệu người dùng
+![alt text](image-189.png)
+
+## Kiến trúc MS
+- Không giống như kiến trúc 3 tầng mà trong đó toàn bộ logic nghiệp vụ được xây dựng trong 1 ứng dụng duy nhất, kiến trúc MS chia nhỏ toàn bộ hệ thống thành các dịch vụ nhỏ độc lập
+- Tổ chức logic nghiệp vụ thành 1 tập hợp các thành phần được liên kết với nhau 1 cách lỏng lẻo và độc lập
+- Mỗi dịch vụ đều thuộc về 1 nhóm nhỏ kĩ sư, họ có thể tự quyết định công nghệ và cách triển khai và có phạm vi trách nhiệm hẹp
+- Lợi ích : 
+    - Khả năng mở rộng cao hơn, vì mỗi dịch vụ chỉ chứa 1 tập con của chức năng tổng thể, codebase trở nên đơn giản và dễ bảo trì, codebase load nhanh hơn trên IDE
+    - Thời gian bulid và deploy nhanh hơn
+    - Dễ dàng test và dễ dàng để hiểu
+    - Với monolithic thì khi 1 dịch vụ bị lỗi thì toàn bộ hệ thống sẽ bị ảnh hưởng, nhưng với MS thì chỉ 1 dịch vụ bị lỗi thì chỉ 1 dịch vụ đó bị ảnh hưởng
+    - Các máy tính không cao cấp cũng có thể chạy được => có thể tiết kiệm chi phí
+    - Sử dụng các công nghệ khác nhau cho từng dịch vụ => Đáp ứng được các công nghệ nhanh hơn bằng cách tái cấu trúc codebase nhỏ hoặc thậm trí viết lại từ đầu
+    - Ít gặp lỗi liên quan đến rò rỉ bộ nhớ hoặc các vấn đề về performance
+    - Dễ dàng mở rộng và scale hệ thống
+- Nhược điểm:
+    - Những thách thức về kĩ thuật: Cần phải xử lý các vấn đề về giao tiếp giữa các dịch vụ, bảo mật, ...
+    - Chúng ta sử dụng kiến trúc với độ phân tán cao: Việc gọi 1 yc từ service A sang service B có thể mất nhiều thời gian hơn so với việc gọi 1 hàm trong cùng 1 ứng dụng
+    - Việc Testing từng dịch vụ riêng lẻ có thể nhanh hơn và dễ dàng hơn, nhưng việc test toàn bộ hệ thống có thể mất nhiều thời gian hơn? Điều gì sẽ xảy ra nếu version của 1 dịch vụ không tương thích với version của dịch vụ khác?
+    - Việc khắc phục lỗi có thể trở nên khó khăn hơn, vì chúng ta cần phải xác định lỗi ở đâu và làm thế nào để fix nó
+    - VD: Yc của người dùng cần phải gọi 3 dịch vụ khác nhau, nếu 1 trong 3 dịch vụ đó bị lỗi thì sẽ ảnh hưởng đến toàn bộ hệ thống vì người dùng có thể nhận được lỗi hoặc không nhận được đúng thông tin của mình, làm thế nào để chúng ta biết service nào chịu trách nhiệm cho vấn đề này? Làm thế nào để thiết lập các phạm vi trách nhiệm cho từng dịch vụ? Nếu có bất cứ thay đổi gì trong 1 dịch vụ mà ảnh hưởng đến cách dịch vụ khác thì chúng ta tách biệt ra để làm gì ?! Mất nhiều thời gian để đọc code của các team khác ?!
+    - Có quá nhiều thứ cần giải quyết, nhưng tin tốt là có nhiều công cụ và framework giúp chúng ta giải quyết vấn đề này và những lỗi phổ biến như: Service Discovery, Load Balancing, API Gateway, Circuit Breaker, Distributed Tracing, ...đã đc giải quyết
+![alt text](image-190.png)
+
+## Thiết lập các ranh giới giữa các dịch vụ
+- Sự phân chia rõ ràng giữa các dịch vụ là rất quan trọng, nó giúp chúng ta xác định rõ ràng trách nhiệm của từng dịch vụ
+- Có nhiều cách để phân chia dịch vụ, nhưng phân chia dịch vụ theo chức năng là cách phổ biến nhất
+- VD: 1 ứng dụng có thể chia thành các dịch vụ sau:
+    - User Service: Quản lý thông tin người dùng
+    - Post Service: Quản lý bài viết
+    - Comment Service: Quản lý bình luận
+    - Vote Service: Quản lý vote
+    - Notification Service: Gửi thông báo
+    - Search Service: Tìm kiếm
+    - Image Service: Quản lý ảnh
+    - Auth Service: Xác thực người dùng
+    - Analytics Service: Phân tích dữ liệu
+    - Payment Service: Thanh toán
+    - Email Service: Gửi email
+    - Chat Service: Chat
+    - Video Service: Quản lý video
+    - ...
+- Sự gắn kết: Các yếu tố dẫn đến sự thay đổi cùng nhau phải nằm trong ranh giời của cùng 1 dịch vụ (KO thế để việc thay đổi 1 dịch vụ ảnh hưởng đến dịch vụ khác)
+![alt text](image-191.png)
+- SRP (Single Responsibility Principle): Mỗi dịch vụ chỉ nên chịu trách nhiệm cho 1 chức năng cụ thể
+![alt text](image-192.png)
+- Loose Coupling: Các dịch vụ không nên phụ thuộc vào nhau, mà nên phụ thuộc vào 1 giao diện chung, giảm thiểu giao tiếp giữa các dịch vụ
+![alt text](image-193.png)
+- Size của mỗi dịch vụ không cần nhỏ nhất có thể, mà cần phải đủ lớn để chứa toàn bộ logic nghiệp vụ của nó
+
+## Các phương pháp để phân tách 1 hệ thống thành MS tuân thủ 3 nguyên tắc chính
+### Decomposition by business capability(Phân tách theo khả năng kinh doanh)
+- Phân tách dịch vụ theo khả năng kinh doanh, mỗi dịch vụ chịu trách nhiệm cho 1 khả năng kinh doanh cụ thể
+![alt text](image-194.png)
+### Decomposition by domain-driven design(Phân tách theo thiết kế hướng tới miền)
+- Phân tách dịch vụ theo thiết kế hướng tới miền, mỗi dịch vụ chịu trách nhiệm cho 1 miền cụ thể
+- Core Domain: Là những miền quan trọng nhất của hệ thống, chúng ta cần phải chú trọng phát triển và bảo vệ chúng
+- Supporting Domain
+- Generic Domain
+![alt text](image-195.png)
+### Decomposition by data ownership(Phân tách theo quyền sở hữu dữ liệu)
+- Phân tách dịch vụ theo quyền sở hữu dữ liệu, mỗi dịch vụ chịu trách nhiệm cho 1 tập dữ liệu cụ thể
+### Decomposition by functional decomposition(Phân tách theo phân rã chức năng)
+- Phân tách dịch vụ theo chức năng, mỗi dịch vụ chịu trách nhiệm cho 1 chức năng cụ thể 
+### Decomposition by Action
+### Decomposition by Entities
+
+## Chuyển đổi từ Monolithic sang Microservices
+
+### Big Bang Approach(Phương pháp Big Bang)
+- Chuyển đổi toàn bộ hệ thống từ Monolithic sang MS trong 1 lần
+- Plan:
+    - Vạch ra các ranh giới giữa các dịch vụ
+    - Thuyết phục quản lí về việc sẽ không phát triển thêm tính năng mới
+    - Chuyển đổi toàn bộ hệ thống sang MS
+- Suface:
+    - Ý tưởng đơn giản và dễ thực hiện
+- Thực tế :
+    - Phương pháp này là phương pháp tồi tệ nhất về năng suất cũng như tác động đến doanh nghiệp
+    - Có quá nhiều kĩ sư trong cùng 1 dự án, mỗi người 1 ý kiến, dẫn đến việc không thống nhất về cách phân chia dịch vụ
+    - Việc ước tính chi phí và thời gian thực hiện là không chính xác vì chúng ta có thể gặp các vấn đề về kĩ thuật, vấn đề về dữ liệu, vấn đề về giao tiếp giữa các dịch vụ, ...
+    - Có thể bị bỏ rơi giữa chừng
+    - Không thể đảm bảo rằng hệ thống sẽ hoạt động đúng cách sau khi chuyển đổi
+    - Dừng mọi hoạt động sẽ ảnh hưởng đến doanh nghiệp, người quản lí có thể thấy nhàm chán và không muốn tiếp tục
+### Strangler Fig Approach(Phương pháp Strangler Fig)
+- Chuyển đổi từ Monolithic sang MS dần dần
+- Plan:
+    - Chọn 1 chức năng trong codebase của mình cái mà nó có thể hưởng lợi nhiều nhất từ việc chuyển đổi sang MS
+    - Khu vực thường xuyên có sự thay đổi và phát triển
+    - Cách thành phần có yêu cầu mở rộng cao
+    - Các thành phần có ít nợ kĩ thuật và khả năng phân tách logic tốt
+- Lợi ích:
+    - Không phải đặt thời hạn cứng để hoàn thành
+    - Chúng ta không ngừng phát triển hệ thống và các kết quả có thể nhìn thấy được
+    - Việc kinh doanh của chúng ta không bị dán đoạn
+### Cách để chuẩn bị cho việc Migration
+- Sau khi chúng ta đã chọn phương pháp chuyển đổi, chúng ta cần phải chuẩn bị cho việc chuyển đổi
+- Xác định các thành phần chúng ta muốn di chuyển, chúng ta phải đảm bảo chúng ta có thử nghiệm. Nếu không toàn bộ sẽ bị hỏng trong quá trình chuyển đổi
+- Define các API 
+- Cố gắng tách biệt với các thành phần khác của ứng dụng
+![alt text](image-196.png)
+
+### Smooth Migration
+- Giữ các công nghệ cũ và mới chạy song song với nhau
