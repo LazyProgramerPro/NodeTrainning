@@ -1,3 +1,356 @@
+# NestJS
+
+## Core Concepts & Dependencies Injection
+
+### NestJS là gì? Tại sao nên sử dụng NestJS?
+
+NestJS là một framework cho Node.js được xây dựng dựa trên TypeScript. Nó sử dụng các khái niệm và mô hình từ Angular để cung cấp một kiến trúc mạnh mẽ và dễ mở rộng cho việc phát triển các ứng dụng server-side. Dưới đây là một số lý do tại sao nên sử dụng NestJS:
+
+- TypeScript: NestJS được xây dựng hoàn toàn bằng TypeScript, mang lại lợi ích của việc sử dụng một ngôn ngữ mạnh mẽ với tính năng kiểm tra kiểu tĩnh, giúp giảm thiểu lỗi và cải thiện khả năng bảo trì mã nguồn.
+
+- Kiến trúc mô-đun: NestJS sử dụng kiến trúc mô-đun, cho phép bạn tổ chức mã nguồn thành các module riêng biệt, dễ quản lý và tái sử dụng.
+
+- Dependency Injection: NestJS cung cấp cơ chế Dependency Injection mạnh mẽ, giúp quản lý các phụ thuộc giữa các thành phần trong ứng dụng một cách dễ dàng và hiệu quả.
+
+- Hỗ trợ đa dạng: NestJS hỗ trợ nhiều thư viện và công nghệ phổ biến như TypeORM, Mongoose, GraphQL, WebSockets, và nhiều hơn nữa, giúp bạn dễ dàng tích hợp và sử dụng các công nghệ này trong ứng dụng của mình.
+
+- Cộng đồng và tài liệu phong phú: NestJS có một cộng đồng lớn và tài liệu phong phú, giúp bạn dễ dàng tìm kiếm sự hỗ trợ và học hỏi từ các nguồn tài liệu có sẵn.
+
+- Hiệu suất cao: NestJS được tối ưu hóa cho hiệu suất cao, giúp bạn xây dựng các ứng dụng server-side mạnh mẽ và hiệu quả.
+
+- Dễ dàng kiểm thử: NestJS cung cấp các công cụ và mô hình để dễ dàng viết và chạy các bài kiểm thử, giúp đảm bảo chất lượng và độ tin cậy của ứng dụng.
+
+Với những lợi ích trên, NestJS là một lựa chọn tuyệt vời cho việc phát triển các ứng dụng server-side hiện đại và mạnh mẽ.
+
+
+### Setting Up First Nest Project
+
+![alt text](image-207.png)
+
+Để bắt đầu một dự án NestJS mới, bạn cần cài đặt Nest CLI (Command Line Interface) bằng cách chạy lệnh sau:
+
+```bash
+npm install -g @nestjs/cli
+nest new project-name
+```
+
+Sau khi cài đặt Nest CLI và tạo một dự án mới, bạn có thể chạy ứng dụng NestJS bằng cách sử dụng lệnh sau:
+
+```bash
+cd project-name
+npm run start
+```
+
+Lệnh `npm run start` sẽ khởi chạy ứng dụng NestJS và mở cổng mặc định 3000 để lắng nghe các yêu cầu HTTP. Bạn có thể truy cập ứng dụng NestJS qua địa chỉ `http://localhost:3000` trong trình duyệt web của bạn.
+
+Sau khi đã cài đặt và khởi chạy dự án NestJS, bạn có thể bắt đầu phát triển ứng dụng của mình bằng cách tạo các module, controller, service, và các thành phần khác trong ứng dụng.
+
+### Tools
+
+ESLint là một công cụ kiểm tra mã nguồn JavaScript và TypeScript để phát hiện và sửa lỗi cú pháp, phong cách và logic trong mã nguồn. Nó giúp đảm bảo mã nguồn của bạn tuân thủ các quy tắc và tiêu chuẩn chất lượng mã nguồn.
+
+```bash
+npm run lint
+```
+
+Prettier là một công cụ tự động định dạng mã nguồn JavaScript và TypeScript để giữ mã nguồn của bạn dễ đọc và dễ hiểu. Nó giúp duy trì một định dạng chuẩn cho mã nguồn của bạn và giảm thời gian và công sức cần thiết để định dạng mã nguồn thủ công.
+
+```bash
+npm run format
+```
+
+### Core concepts
+
+- Application:
+  - HTTP server
+  - Microservice Application
+  - A Standalone Application
+- Các thành phần của NestJs
+  ![alt text](image-219.png)
+- Module:
+  - Là các khối xây dựng cơ bản của ứng dụng NestJS và chứa các controller, provider, và các thành phần khác.
+  - Mỗi ứng dụng NestJS có ít nhất một module gốc (root module) được gọi là `AppModule`.
+  ![alt text](image-209.png)
+
+- Decorator:
+  ![alt text](image-211.png)
+  ![alt text](image-212.png)
+  ![alt text](image-213.png)
+  ![alt text](image-214.png)
+  - Là các hàm `đặc biệt` được sử dụng để thêm metadata hoặc chức năng cho các class, methods, hoặc properties trong TypeScript.
+  - NestJS sử dụng các decorator để đánh dấu các class, methods, properties, và các thành phần khác trong ứng dụng.
+  - Ví dụ: `@Module`, `@Controller`, `@Injectable`, `@Get`, `@Post`, `@Put`, `@Delete`, `@Param`, `@Body`, `@Query`, `@Inject`, `@UseGuards`, `@UseInterceptors`, `@UseFilters`, `@UsePipes`, và nhiều decorator khác.
+  - Có thể hình dung nó như 1 chiếc áo hay 1 cái phụ kiện gì đó chúng ta đeo vào để trở nên mạnh hơn, đẹp hơn, hoặc thông minh hơn.
+
+- Controller:
+  -  `@Controller()`
+  - Khi bạn có 1 thành phần Module, bạn cần 1 cách để xử lý các yêu cầu HTTP từ client và trả về các phản hồi tương ứng.
+  - Controller là một thành phần trong ứng dụng NestJS được sử dụng để xử lý các yêu cầu HTTP từ client và trả về các phản hồi tương ứng.
+  - Mỗi controller chứa một hoặc nhiều route handlers (methods) được gắn với các endpoint HTTP cụ thể.
+  - Ví dụ: `@Get`, `@Post`, `@Put`, `@Delete`, `@Patch`, `@Options`, `@Head`, `@All`.
+  ![alt text](image-215.png)
+  ![alt text](image-216.png)
+
+- Provider:
+  - Về đơn giản là 1 Class có thể được đưa vào các lớp khác thông qua Dependency Injection.
+  - `@Injectable()`
+  - Ví dụ như khi bạn đánh dấu 1 class với `@Injectable()`, bạn có thể sử dụng nó trong các controller, service, hoặc các thành phần khác trong ứng dụng NestJS bằng cách sử dụng provider.
+
+  VD: 
+  ```typescript
+  @Injectable()
+  export class UserService {
+    getUsers(): string {
+      return 'This action returns all users';
+    }
+  }
+  ```
+  ```typescript
+  @Controller('users')
+  export class UserController {
+    constructor(private readonly userService: UserService) {}
+
+    @Get()
+    findAll(): string {
+      return this.userService.getUsers();
+    }
+  }
+  ```
+
+  ```typescript
+  @Module({
+    controllers: [UserController],
+    providers: [UserService],
+  })
+  export class UserModule {}
+  ```
+- Request Response:
+  ![alt text](image-217.png)
+  ![alt text](image-218.png)
+- Middleware:
+  - Middleware là một hàm hoặc một class được sử dụng để xử lý các yêu cầu HTTP trước khi chúng được chuyển đến các route handlers (controllers) hoặc sau khi chúng được xử lý bởi các route handlers.
+  - Middleware có thể thực hiện các chức năng như xác thực, ghi log, xử lý lỗi, và nhiều chức năng khác.
+  - Middleware có thể được áp dụng cho toàn bộ ứng dụng hoặc cho một số route cụ thể.
+  - Ví dụ: `@Middleware`, `@Use`, `@UseGuards`, `@UseInterceptors`, `@UseFilters`, `@UsePipes`.
+  - Ví dụ như bạn đi máy bay thì chúng ta không thể vào được máy bay luôn mà chúng ta cần làm thủ tục gửi hành lí, sau đó đi qua cửa an ninh, xuất trình thẻ lên máy bay ....sau đó mới lên được máy bay. Việc thực hiện 1 Request cũng tương tự như vậy, chúng ta cần phải đi qua các bước kiểm tra, xử lý trước khi đến được đích.
+
+  ```typescript
+  import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+  import { LoggerMiddleware } from './common/middleware/logger.middleware';
+  import { CatsModule } from './cats/cats.module';
+
+  @Module({
+    imports: [CatsModule],
+  })
+  export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+      consumer
+        .apply(LoggerMiddleware)
+        .forRoutes('cats');
+    }
+  }
+  ```
+  ```typescript
+  consumer
+  .apply(LoggerMiddleware)
+  .exclude(
+    { path: 'cats', method: RequestMethod.GET },
+    { path: 'cats', method: RequestMethod.POST },
+    'cats/(.*)',
+  )
+  .forRoutes(CatsController);
+  ```
+- Guards
+  - Guards là các hàm hoặc class được sử dụng để kiểm tra và xác thực các yêu cầu HTTP trước khi chúng được chuyển đến các route handlers (controllers).
+  - Guards có thể được sử dụng để kiểm tra quyền truy cập, xác thực người dùng, kiểm tra dữ liệu đầu vào, và nhiều chức năng khác.
+  - Ví dụ: `@Guard`, `@UseGuards `
+  - Ví dụ như khi bạn vào 1 quán bar, bạn cần phải xuất trình thẻ căn cước hoặc thẻ sinh viên để chứng minh bạn đủ tuổi để vào quán bar. Guard cũng tương tự như vậy, nó sẽ kiểm tra xem bạn có đủ quyền truy cập vào 1 route hay không.
+
+  ```typescript
+  import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+  import { Observable } from 'rxjs';
+  
+  @Injectable()
+  export class AuthGuard implements CanActivate {
+    canActivate(
+      context: ExecutionContext,
+    ): boolean | Promise<boolean> | Observable<boolean> {
+      return true;
+    }
+  }
+  ```
+  ```typescript
+  import { Controller, Get, UseGuards } from '@nestjs/common';
+  import { AuthGuard } from './auth.guard';
+
+  @Controller('cats')
+  export class CatsController {
+    @UseGuards(AuthGuard)
+    @Get()
+    findAll(): string {
+      return 'This action returns all cats';
+    }
+  }
+  ```
+- Interceptors
+  - Interceptors là các class được sử dụng để xử lý các yêu cầu HTTP trước khi chúng được chuyển đến các route handlers (controllers) hoặc sau khi chúng được xử lý bởi các route handlers.
+  - Interceptors có thể thực hiện các chức năng như ghi log, xử lý lỗi, thay đổi dữ liệu, CACHING, SERIALIZE, và nhiều chức năng khác trước hoặc sau khi yêu cầu được xử lý.
+  - Ví dụ: `@Interceptor`, `@UseInterceptors`
+
+  ```typescript
+  import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+  import { Observable } from 'rxjs';
+
+  @Injectable()
+  export class LoggingInterceptor implements NestInterceptor {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+      console.log('Before...');
+  
+      const now = Date.now();
+      return next
+        .handle()
+        .pipe(tap(() => console.log(`After... ${Date.now() - now}ms`)));
+    }
+  }
+  ```
+  ```typescript
+  import { Controller, Get, UseInterceptors } from '@nestjs/common';
+  import { LoggingInterceptor } from './logging.interceptor';
+
+  @Controller('cats')
+  export class CatsController {
+    @UseInterceptors(LoggingInterceptor)
+    @Get()
+    findAll(): string {
+      return 'This action returns all cats';
+    }
+  }
+  ```
+
+- Pipes:
+  - Pipes là các class được sử dụng để xử lý và kiểm tra dữ liệu đầu vào trước khi chúng được chuyển đến các route handlers (controllers) hoặc sau khi chúng được xử lý bởi các route handlers.
+  - Pipes có thể thực hiện các chức năng như kiểm tra kiểu dữ liệu, chuyển đổi dữ liệu, xác thực dữ liệu, và nhiều chức năng khác.
+  - Ví dụ: `@Pipe`, `@UsePipes`
+  - `ValidationPipe`
+  - `ParseIntPipe`
+  - `ParseFloatPipe`
+  - `ParseBoolPipe`
+  - `ParseArrayPipe`
+  - `ParseUUIDPipe`
+  - `ParseEnumPipe`
+  - `DefaultValuePipe`
+  - `ParseFilePipe`
+
+  ```typescript
+  import { Injectable, PipeTransform, ArgumentMetadata } from '@nestjs/common';
+
+  @Injectable()
+  export class ValidationPipe implements PipeTransform {
+    transform(value: any, metadata: ArgumentMetadata) {
+      // validate the value
+      return value;
+    }
+  }
+  ```
+  ```typescript
+  import { Controller, Get, UsePipes } from '@nestjs/common';
+  import { ValidationPipe } from './validation.pipe';
+
+  @Controller('cats')
+  export class CatsController {
+    @UsePipes(ValidationPipe)
+    @Get()
+    findAll(): string {
+      return 'This action returns all cats';
+    }
+  }
+  ```
+
+  ```typescript
+  //Controlle
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.catsService.findOne(id);
+  }
+
+  //Request
+  GET localhost:3000/abc
+
+  //Handle
+  {
+    "statusCode": 400,
+    "message": "Validation failed (numeric string is expected)",
+    "error": "Bad Request"
+  }
+
+  //Custom
+
+  @Get(':id')
+  async findOne(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+    id: number,
+  ) {
+    return this.catsService.findOne(id);
+  }
+
+  @Get()
+  async findOne(@Query('id', ParseIntPipe) id: number) {
+    return this.catsService.findOne(id);
+  }
+
+  @Get(':uuid')
+  async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return this.catsService.findOne(uuid);
+  }
+  ```
+
+- Exception Filters:
+  - Exception Filters là các class được sử dụng để xử lý các ngoại lệ (exceptions) được ném trong quá trình xử lý yêu cầu HTTP.
+  - Exception Filters có thể được sử dụng để xử lý và trả về các phản hồi lỗi tùy chỉnh khi xảy ra ngoại lệ.
+  - Ví dụ: `@ExceptionFilter`, `@UseFilters`
+  
+  ```typescript
+  import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+
+  @Catch(HttpException)
+  export class HttpExceptionFilter implements ExceptionFilter {
+    catch(exception: HttpException, host: ArgumentsHost) {
+      const ctx = host.switchToHttp();
+      const response = ctx.getResponse();
+      const request = ctx.getRequest();
+      const status = exception.getStatus();
+
+      response
+        .status(status)
+        .json({
+          statusCode: status,
+          timestamp: new Date().toISOString()
+          })
+    }
+  }
+  ```
+  ```typescript
+  @Controller('cats')
+  export class CatsController {
+    @Get()
+    @UseFilters(HttpExceptionFilter)
+    findAll() {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+  }
+  ```
+
+
+
+
+
+
+
+
+
+
+
+
 # TypeORM
 - TypeORM là một thư viện ORM (Object-Relational Mapping) cho TypeScript và JavaScript (ES7, ES6, ES5). Nó hỗ trợ nhiều cơ sở dữ liệu như MySQL, MariaDB, PostgreSQL, SQLite, MS SQL Server, Oracle, WebSQL.
 - TypeORM cho phép bạn tạo các entity (đối tượng) để tương tác với cơ sở dữ liệu mà không cần viết các truy vấn SQL trực tiếp. Thay vào đó, bạn có thể sử dụng các phương thức của TypeORM để thực hiện các thao tác CRUD (Create, Read, Update, Delete) trên cơ sở dữ liệu.
