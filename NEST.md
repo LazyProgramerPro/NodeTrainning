@@ -489,4 +489,236 @@ npm run format
   ```
 # QueryBuilder trong TypeORM
 
-# GRAphQL
+# GraphQL
+
+# Init Project
+
+- Cài đặt nest cli
+```bash
+$ npm i -g @nestjs/cli
+$ nest new nest-grapql
+```
+- Sau khi cài đặt xong, chạy lệnh sau để kiểm tra
+```bash
+$ cd nest-grapql
+$ npm run start:dev
+```
+- Mở trình duyệt và truy cập vào địa chỉ `http://localhost:3000/` để kiểm tra
+- Tip nhỏ: nên comment file .eslintrc.js để tránh lỗi eslint - comment dòng `module.exports = { ... }` đến hết file
+- Câu hỏi : npm run start hoặc npm run start:dev khác nhau như thế nào?
+
+# Install GraphQL
+
+- Cài đặt thư viện graphql
+
+```bash
+$ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
+```
+
+- Trong file `src/app.module.ts` thêm đoạn code để setup graphql + apollo server (Server GraphQL)
+
+- src/app.module.ts
+```typescript
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { join } from 'path';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver, // sử dụng driver ApolloDriver
+      playground: false, // tắt chế độ playground mặt định
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // đường dẫn đến file schema
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // thêm plugin landing page
+    }),
+  ],
+})
+export class AppModule {}
+
+```
+- Sau khi chúng ta chạy xong thì terminal sẽ hiện ra thông báo lỗi: Error: Query root type must be provided 
+- Câu hỏi: Lỗi trên là do gì?
+
+# Thêm 1 module mới
+
+- Tạo resource `items` bằng nest cli
+
+```bash
+$ nest g res items --no-spec
+```
+
+- Lúc này chúng ta sẽ được hỏi muốn tạo kiểu transport nào, chọn  `GraphQL code first`
+
+- Sau khi tạo xong, chúng ta sẽ thấy thư mục `items` được tạo ra trong thư mục `src` và hết lỗi Query root type must be provided (vì đã tạo ra 1 query type) => File schema.gql sẽ được tự động tạo ra
+
+- Folder items bao gồm đầy đủ các file cần thiết để tạo ra 1 module graphql: `items.resolver.ts`, `items.service.ts`, `items.entity.ts`, `items.module.ts` và đã được import vào `app.module.ts`. Lúc này chúng ta có thể xem nó đc import vào `app.module.ts` như thế nào?
+
+- src/app.module.ts
+```typescript
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
+import { ItemsModule } from './items/items.module';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver, // sử dụng driver ApolloDriver
+      playground: false, // tắt chế độ playground mặt định
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // đường dẫn đến file schema
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // thêm plugin landing page
+    }),
+    ItemsModule,
+  ],
+})
+export class AppModule {}
+```
+- Xem kết quả bằng cách chạy lệnh `npm run start:dev` và truy cập vào địa chỉ `http://localhost:3000/graphql` để kiểm tra
+- Lúc này chúng ta sẽ thấy 1 query `items` được tạo ra và có thể thử nghiệm nhưng sẽ bị lỗi vì chưa có dữ liệu
+
+# Thêm database
+
+- Sử dụng docker để tạo database postgres
+
+- Tạo file `docker-compose.yml` trong thư mục gốc của project
+
+- docker-compose.yml
+```yml
+version: '3'
+
+services:
+  db:
+    image: postgres:14.4
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: anylistDB
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+
+```
+- thêm biến môi trường vào file `.env` trong thư mục gốc của project
+
+- .env
+```env
+STATE=dev
+DB_PASSWORD=algunpassword
+DB_NAME=AnyList
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+```
+- Tìm hiểu Dokcerfile và docker-compose.yml là gì?
+
+- Chạy lệnh sau để tạo database ( lưu ý: cần cài đặt docker trước)
+- Nếu sử dụng window thì dùng docker desktop là đủ
+- Nếu file đc mount ra thì thêm `./postgres` vào file `.gitignore` để tránh lưu file vào git
+
+```bash
+$ docker-compose up -d
+```
+- Sau khi chạy xong, mở docker desktop để kiểm tra xem container đã được tạo chưa
+
+- Cài đặt thư viện `TypeORM` và `pg` để kết nối với database postgres
+
+```bash
+$ npm i @nestjs/typeorm typeorm pg
+```
+
+- Thêm kết nối database vào file `src/app.module.ts`
+- src/app.module.ts
+```typescript
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
+import { ItemsModule } from './items/items.module';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver, // sử dụng driver ApolloDriver
+      playground: false, // tắt chế độ playground mặt định
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // đường dẫn đến file schema
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // thêm plugin landing page
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      synchronize: true,
+      autoLoadEntities: true,
+    }),
+    ItemsModule,
+  ],
+})
+export class AppModule {}
+```
+
+- Nếu chỉ thêm đơn thuần như thế này sẽ không load được các environment variables từ file `.env` => cần cài thêm thư viện @nestjs/config để load các biến môi trường từ file `.env`
+
+```bash
+$ npm i @nestjs/config
+```
+
+- Thêm đoạn config vào file `src/app.module.ts`
+
+- src/app.module.ts
+```typescript
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
+import { ItemsModule } from './items/items.module';
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }), // thêm module ConfigModule
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver, // sử dụng driver ApolloDriver
+      playground: false, // tắt chế độ playground mặt định
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // đường dẫn đến file schema
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // thêm plugin landing page
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      synchronize: true,
+      autoLoadEntities: true,
+    }),
+    ItemsModule,
+  ],
+})
+export class AppModule {}
+```
+- Chạy lệnh `npm run start:dev` để kiểm tra kết nối database
+
+# Tạo entity
+
+
+
+
+
+
